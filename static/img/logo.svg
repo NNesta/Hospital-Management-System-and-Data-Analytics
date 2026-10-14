@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Ubuzima HMS">
+  <!-- Colours of the Rwandan flag: sky blue, yellow and green -->
+  <defs><clipPath id="r"><rect width="64" height="64" rx="14"/></clipPath></defs>
+  <g clip-path="url(#r)">
+    <rect width="64" height="64" fill="#00a1de"/>
+    <rect y="40" width="64" height="6" fill="#fad201"/>
+    <rect y="46" width="64" height="18" fill="#20603d"/>
+  </g>
+  <circle cx="51" cy="12" r="6" fill="#fad201"/>
+  <path d="M26 8h12v12h12v12H38v12H26V32H14V20h12z" fill="#fff"/>
+</svg>

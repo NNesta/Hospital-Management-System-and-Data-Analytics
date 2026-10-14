@@ -1,0 +1,6 @@
+{% extends "form_base.html" %}
+{% block title %}{% if object %}Edit medicine{% else %}New medicine{% endif %}{% endblock %}
+{% block page_title %}{% if object %}Edit {{ object.name }}{% else %}New medicine{% endif %}{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'pharmacy:medicine_list' %}">Medicines</a></li><li class="breadcrumb-item active">{% if object %}Edit{% else %}New{% endif %}</li>{% endblock %}
+{% block card_title %}Medicine and stock{% endblock %}
+{% block cancel_url %}{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'pharmacy:medicine_list' %}{% endif %}{% endblock %}

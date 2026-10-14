@@ -1,0 +1,28 @@
+{% load hms_extras %}
+<div class="card mb-4">
+  <div class="card-header">
+    <h3 class="card-title">Today's appointments</h3>
+    {% if user|has_role:"ADMIN,RECEPTIONIST,DOCTOR" %}
+    <div class="card-tools"><a href="{% url 'appointments:list' %}?when=today" class="btn btn-tool" title="Open list"><i class="bi bi-box-arrow-up-right"></i></a></div>
+    {% endif %}
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive" style="max-height: 340px">
+      <table class="table table-sm table-hover mb-0">
+        <thead><tr><th class="ps-3">Time</th><th>Patient</th><th>Doctor</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for appt in todays_appointments %}
+          <tr>
+            <td class="ps-3">{{ appt.appointment_time|time:"H:i" }}</td>
+            <td>{% if user|has_role:"ADMIN,RECEPTIONIST,DOCTOR" %}<a href="{{ appt.get_absolute_url }}">{{ appt.patient.full_name }}</a>{% else %}{{ appt.patient.full_name }}{% endif %}</td>
+            <td>{{ appt.doctor }}</td>
+            <td>{% status_badge appt %}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="text-center text-body-secondary py-4">No appointments today.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,62 @@
+/* Small additions on top of AdminLTE 4. Colours come from Bootstrap tokens so
+   light and dark mode both work without extra rules. */
+
+:root {
+  --hms-rw-blue: #00a1de;   /* Rwandan flag */
+  --hms-rw-yellow: #fad201;
+  --hms-rw-green: #20603d;
+}
+
+/* Thin flag stripe under the top navbar */
+.app-header { border-bottom: 3px solid; border-image: linear-gradient(90deg, var(--hms-rw-blue) 0 70%, var(--hms-rw-yellow) 70% 80%, var(--hms-rw-green) 80% 100%) 1; }
+
+.sidebar-wrapper { overflow-y: auto; }
+.brand-image { border-radius: .5rem; }
+
+/* Initials avatar (no photos are stored) */
+.avatar-initials {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 2rem; height: 2rem; border-radius: 50%;
+  color: #fff; font-weight: 600; font-size: .8rem; letter-spacing: .02em;
+}
+.avatar-initials.avatar-lg { width: 5rem; height: 5rem; font-size: 1.75rem; margin: 0 auto .5rem; display: flex; }
+.user-menu .user-header { height: auto; padding-bottom: 1rem; }
+
+/* KPI small boxes: equal heights in a row, long RWF values on one line */
+.kpi-row .small-box { display: flex; flex-direction: column; height: calc(100% - 1.25rem); }
+.kpi-row .small-box .inner { flex: 1; }
+.small-box .inner h3 { font-size: clamp(1.4rem, 2.4vw, 2.1rem); white-space: nowrap; }
+.small-box .inner p { margin-bottom: 0; }
+.small-box .kpi-sub { font-size: .85rem; opacity: .85; }
+
+/* Chart cards */
+.chart-box { position: relative; height: 280px; }
+.chart-box.chart-box-sm { height: 240px; }
+.chart-table { font-size: .875rem; }
+.chart-table td, .chart-table th { font-variant-numeric: tabular-nums; }
+
+/* Tables */
+.table td, .table th { vertical-align: middle; }
+@media (max-width: 991.98px) {
+  /* On phones keep cells on one line; .table-responsive scrolls sideways */
+  .table-responsive > .table td, .table-responsive > .table th { white-space: nowrap; }
+}
+.table .actions { white-space: nowrap; text-align: end; }
+.num { text-align: end; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Formset delete checkbox */
+.formset-table input[type="checkbox"] { width: 1.1rem; height: 1.1rem; }
+.formset-table td { min-width: 7rem; }
+
+/* Detail pages */
+.detail-list dt { font-weight: 500; color: var(--bs-secondary-color); }
+.detail-list dd { margin-bottom: .6rem; }
+.profile-avatar { width: 6rem; height: 6rem; font-size: 2rem; margin: 0 auto; display: flex; }
+
+/* Printable invoice */
+@media print {
+  .app-header, .app-sidebar, .app-footer, .app-content-header, .d-print-none { display: none !important; }
+  .app-main { margin: 0 !important; }
+  .card { box-shadow: none !important; border: 0 !important; }
+  body { background: #fff !important; }
+}

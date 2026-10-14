@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Visits to bill{% endblock %}
+{% block page_title %}Visits to bill{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'billing:invoice_list' %}">Invoices</a></li><li class="breadcrumb-item active">To bill</li>{% endblock %}
+{% block content %}
+<div class="card mb-4">
+  <div class="card-header d-flex flex-wrap gap-2 align-items-center">
+    <p class="mb-0 me-auto text-body-secondary">Completed consultations without an invoice. <em>Generate</em> adds the doctor's fee and every dispensed medicine.</p>
+    <form method="get" role="search">
+      <div class="input-group" style="max-width: 20rem">
+        <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Patient name or code" aria-label="Search">
+        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+      </div>
+    </form>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Visit date</th><th>Patient</th><th>Doctor</th><th>Department</th><th>Insurance</th><th></th></tr></thead>
+        <tbody>
+          {% for appt in object_list %}
+          <tr>
+            <td>{{ appt.appointment_date|date:"j M Y" }} {{ appt.appointment_time|time:"H:i" }}</td>
+            <td><a href="{{ appt.patient.get_absolute_url }}">{{ appt.patient.full_name }}</a> <small class="text-body-secondary">{{ appt.patient.patient_code }}</small></td>
+            <td>{{ appt.doctor }}</td>
+            <td>{{ appt.doctor.department.name }}</td>
+            <td>{{ appt.patient.insurance_provider }}</td>
+            <td class="actions">
+              <form method="post" action="{% url 'billing:generate' appt.pk %}" class="m-0">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-receipt me-1"></i>Generate invoice</button>
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="text-center text-body-secondary py-4">Every completed visit has been billed.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card-footer">{% include "partials/_pagination.html" %}</div>
+</div>
+{% endblock %}

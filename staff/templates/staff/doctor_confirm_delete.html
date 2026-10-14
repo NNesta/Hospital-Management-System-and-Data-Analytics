@@ -1,0 +1,10 @@
+{% extends "confirm_delete_base.html" %}
+{% block page_title %}Deactivate doctor{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'staff:doctor_list' %}">Doctors</a></li><li class="breadcrumb-item active">Deactivate</li>{% endblock %}
+{% block card_title %}Deactivate {{ doctor }}?{% endblock %}
+{% block warning %}
+<p><strong>{{ doctor }}</strong> will be hidden from booking and marked inactive.</p>
+<p class="mb-0 text-body-secondary">Past appointments, medical records and invoices keep their doctor. The login account is not changed.</p>
+{% endblock %}
+{% block confirm_icon %}person-x{% endblock %}
+{% block confirm_label %}Yes, deactivate{% endblock %}

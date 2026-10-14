@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static humanize hms_extras %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}{% if is_doctor %}My dashboard{% else %}Dashboard{% endif %}{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item active">Dashboard</li>{% endblock %}
+{% block content %}
+<p class="text-body-secondary mb-3">
+  Muraho, {{ user.first_name|default:user.username }}.
+  {% if is_doctor %}These numbers cover your own patients and appointments.{% else %}Live figures for {{ HOSPITAL.NAME }}.{% endif %}
+</p>
+
+{# KPI cards (AdminLTE small boxes); the order depends on the role #}
+<div class="row kpi-row">
+  {% for card in kpi_cards %}
+  <div class="col-lg-4 col-sm-6">
+    <div class="small-box text-bg-{{ card.color }}">
+      <div class="inner">
+        <h3 title="{% if card.money %}{{ card.value|rwf }}{% else %}{{ card.value }}{% endif %}">{% if card.money %}{{ card.value|rwf_compact }}{% else %}{{ card.value|intcomma }}{% endif %}</h3>
+        <p>{{ card.label }}</p>
+        <div class="kpi-sub">{{ card.sub }}</div>
+      </div>
+      <i class="small-box-icon bi {{ card.icon }}" aria-hidden="true"></i>
+      <a href="{% url card.url %}" class="small-box-footer {% if card.color == 'warning' %}link-dark{% else %}link-light{% endif %} link-underline-opacity-0 link-underline-opacity-50-hover">
+        More info <i class="bi bi-link-45deg"></i>
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% for section in sections %}
+  {% if section == "clinical" %}{% include "analytics/sections/_clinical.html" %}
+  {% elif section == "finance" %}{% include "analytics/sections/_finance.html" %}
+  {% elif section == "pharmacy" %}{% include "analytics/sections/_pharmacy.html" %}{% endif %}
+{% endfor %}
+
+{# json_script escapes the data safely, so no |safe is needed #}
+{{ charts|json_script:"dashboard-data" }}
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'vendor/chart.js/chart.umd.min.js' %}"></script>
+<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

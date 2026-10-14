@@ -1,0 +1,115 @@
+{% load static hms_extras %}
+{% with app=request.resolver_match.app_name url=request.resolver_match.url_name %}
+<aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+  <div class="sidebar-brand">
+    <a href="{% url 'analytics:dashboard' %}" class="brand-link">
+      <img src="{% static 'img/logo.svg' %}" alt="" class="brand-image opacity-75 shadow">
+      <span class="brand-text fw-light">{{ HOSPITAL.SHORT_NAME }}</span>
+    </a>
+  </div>
+  <div class="sidebar-wrapper">
+    <nav class="mt-2">
+      <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" aria-label="Main navigation" data-accordion="false">
+        <li class="nav-item">
+          <a href="{% url 'analytics:dashboard' %}" class="nav-link {% if app == 'analytics' and url == 'dashboard' %}active{% endif %}">
+            <i class="nav-icon bi bi-speedometer2"></i><p>Dashboard</p>
+          </a>
+        </li>
+        {% if user|has_role:"ADMIN,ACCOUNTANT,RECEPTIONIST,DOCTOR" %}
+        <li class="nav-item">
+          <a href="{% url 'analytics:reports' %}" class="nav-link {% if app == 'analytics' and url != 'dashboard' %}active{% endif %}">
+            <i class="nav-icon bi bi-bar-chart-line"></i><p>Reports</p>
+          </a>
+        </li>
+        {% endif %}
+
+        {% if user|has_role:"ADMIN,RECEPTIONIST,DOCTOR,ACCOUNTANT" %}
+        <li class="nav-header">CLINICAL</li>
+        <li class="nav-item">
+          <a href="{% url 'patients:list' %}" class="nav-link {% if app == 'patients' %}active{% endif %}">
+            <i class="nav-icon bi bi-people"></i><p>Patients</p>
+          </a>
+        </li>
+        {% endif %}
+        {% if user|has_role:"ADMIN,RECEPTIONIST,DOCTOR" %}
+        <li class="nav-item">
+          <a href="{% url 'appointments:list' %}" class="nav-link {% if app == 'appointments' and 'record' not in url %}active{% endif %}">
+            <i class="nav-icon bi bi-calendar2-week"></i><p>Appointments</p>
+          </a>
+        </li>
+        {% endif %}
+        {% if user|has_role:"ADMIN,DOCTOR" %}
+        <li class="nav-item">
+          <a href="{% url 'appointments:record_list' %}" class="nav-link {% if app == 'appointments' and 'record' in url %}active{% endif %}">
+            <i class="nav-icon bi bi-journal-medical"></i><p>Medical records</p>
+          </a>
+        </li>
+        {% endif %}
+
+        {% if user|has_role:"ADMIN,DOCTOR,PHARMACIST" %}
+        <li class="nav-header">PHARMACY</li>
+        <li class="nav-item">
+          <a href="{% url 'pharmacy:prescription_list' %}" class="nav-link {% if app == 'pharmacy' and 'prescription' in url or app == 'pharmacy' and url == 'dispense' %}active{% endif %}">
+            <i class="nav-icon bi bi-prescription2"></i><p>Prescriptions</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'pharmacy:medicine_list' %}" class="nav-link {% if app == 'pharmacy' and 'medicine' in url %}active{% endif %}">
+            <i class="nav-icon bi bi-capsule"></i><p>Medicines &amp; stock</p>
+          </a>
+        </li>
+        {% endif %}
+
+        {% if user|has_role:"ADMIN,ACCOUNTANT,RECEPTIONIST" %}
+        <li class="nav-header">BILLING</li>
+        {% if user|has_role:"ADMIN,ACCOUNTANT" %}
+        <li class="nav-item">
+          <a href="{% url 'billing:pending' %}" class="nav-link {% if app == 'billing' and url == 'pending' %}active{% endif %}">
+            <i class="nav-icon bi bi-hourglass-split"></i><p>Visits to bill</p>
+          </a>
+        </li>
+        {% endif %}
+        <li class="nav-item">
+          <a href="{% url 'billing:invoice_list' %}" class="nav-link {% if app == 'billing' and 'invoice' in url or app == 'billing' and url == 'print' %}active{% endif %}">
+            <i class="nav-icon bi bi-receipt"></i><p>Invoices</p>
+          </a>
+        </li>
+        {% if user|has_role:"ADMIN,ACCOUNTANT" %}
+        <li class="nav-item">
+          <a href="{% url 'billing:payment_list' %}" class="nav-link {% if app == 'billing' and 'payment' in url %}active{% endif %}">
+            <i class="nav-icon bi bi-cash-stack"></i><p>Payments</p>
+          </a>
+        </li>
+        {% endif %}
+        {% endif %}
+
+        <li class="nav-header">HOSPITAL</li>
+        <li class="nav-item">
+          <a href="{% url 'staff:department_list' %}" class="nav-link {% if app == 'staff' and 'department' in url %}active{% endif %}">
+            <i class="nav-icon bi bi-building"></i><p>Departments</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'staff:doctor_list' %}" class="nav-link {% if app == 'staff' and 'doctor' in url %}active{% endif %}">
+            <i class="nav-icon bi bi-person-badge"></i><p>Doctors</p>
+          </a>
+        </li>
+        {% if user|has_role:"ADMIN" %}
+        <li class="nav-item">
+          <a href="{% url 'accounts:user_list' %}" class="nav-link {% if app == 'accounts' and 'user' in url %}active{% endif %}">
+            <i class="nav-icon bi bi-person-gear"></i><p>Users &amp; roles</p>
+          </a>
+        </li>
+        {% if user.is_staff %}
+        <li class="nav-item">
+          <a href="{% url 'admin:index' %}" class="nav-link">
+            <i class="nav-icon bi bi-tools"></i><p>Django admin</p>
+          </a>
+        </li>
+        {% endif %}
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+</aside>
+{% endwith %}

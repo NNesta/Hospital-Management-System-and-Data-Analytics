@@ -1,0 +1,7 @@
+{% extends "confirm_delete_base.html" %}
+{% block page_title %}Delete medical record{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'appointments:record_list' %}">Medical records</a></li><li class="breadcrumb-item active">Delete</li>{% endblock %}
+{% block warning %}
+<p>Delete the record <strong>{{ object.diagnosis }}</strong> for {{ object.appointment.patient.full_name }}?</p>
+<p class="mb-0 text-body-secondary">Records with prescriptions cannot be deleted.</p>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load hms_extras %}
+{% block title %}Payment{% endblock %}
+{% block page_title %}Payment {{ payment.amount|rwf }}{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'billing:payment_list' %}">Payments</a></li><li class="breadcrumb-item active">#{{ payment.pk }}</li>{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card card-success card-outline mb-4">
+      <div class="card-header"><h3 class="card-title">Receipt</h3></div>
+      <div class="card-body">
+        <dl class="row detail-list mb-0">
+          <dt class="col-5">Amount</dt><dd class="col-7 fs-5 fw-semibold">{{ payment.amount|rwf }}</dd>
+          <dt class="col-5">Method</dt><dd class="col-7">{{ payment.get_method_display }}</dd>
+          <dt class="col-5">Reference</dt><dd class="col-7"><code>{{ payment.reference|default:"—" }}</code></dd>
+          <dt class="col-5">Paid at</dt><dd class="col-7">{{ payment.paid_at|date:"j M Y, H:i" }}</dd>
+          <dt class="col-5">Received by</dt><dd class="col-7">{{ payment.received_by|default:"—" }}</dd>
+          <dt class="col-5">Invoice</dt><dd class="col-7"><a href="{{ payment.invoice.get_absolute_url }}">{{ payment.invoice.invoice_number }}</a> {% status_badge payment.invoice %}</dd>
+          <dt class="col-5">Patient</dt><dd class="col-7">{{ payment.invoice.patient.full_name }}</dd>
+        </dl>
+      </div>
+      {% if user.role == "ADMIN" %}
+      <div class="card-footer d-flex gap-2">
+        <a href="{% url 'billing:payment_update' payment.pk %}" class="btn btn-sm btn-primary"><i class="bi bi-pencil me-1"></i>Edit</a>
+        <a href="{% url 'billing:payment_delete' payment.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>Delete</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

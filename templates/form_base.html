@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% comment %}
+  Shared Create/Update page: card with a two-column grid, Save and Cancel.
+  App templates (<model>_form.html) extend this and fill the blocks.
+{% endcomment %}
+{% block content %}
+<div class="card card-primary card-outline mb-4">
+  <div class="card-header">
+    <h3 class="card-title">{% block card_title %}{% if object %}Edit{% else %}New{% endif %}{% endblock %}</h3>
+  </div>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="card-body">
+      {% block form_body %}{% include "partials/_form_fields.html" %}{% endblock %}
+    </div>
+    <div class="card-footer d-flex justify-content-end gap-2">
+      <a href="{% block cancel_url %}{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'analytics:dashboard' %}{% endif %}{% endblock %}" class="btn btn-outline-secondary">Cancel</a>
+      <button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i>{% block submit_label %}Save{% endblock %}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Consultation{% endblock %}
+{% block page_title %}Consultation{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'appointments:list' %}">Appointments</a></li><li class="breadcrumb-item active">Consultation</li>{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card card-success card-outline mb-4">
+      <div class="card-header">
+        <h3 class="card-title">{{ appointment.patient.full_name }} &middot; {{ appointment.patient.get_gender_display }}, {{ appointment.patient.age }} yrs</h3>
+      </div>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="card-body">
+          <p class="mb-3"><strong>Reason for visit:</strong> {{ appointment.reason }}</p>
+          {% include "partials/_form_fields.html" %}
+        </div>
+        <div class="card-footer d-flex justify-content-end gap-2">
+          <a href="{{ appointment.get_absolute_url }}" class="btn btn-outline-secondary">Cancel</a>
+          <button type="submit" class="btn btn-success"><i class="bi bi-check2-circle me-1"></i>Save and complete visit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card mb-4">
+      <div class="card-header"><h3 class="card-title">Patient</h3></div>
+      <div class="card-body">
+        <dl class="detail-list mb-0">
+          <dt>Code</dt><dd><code>{{ appointment.patient.patient_code }}</code></dd>
+          <dt>Blood group</dt><dd>{{ appointment.patient.get_blood_group_display }}</dd>
+          <dt>Insurance</dt><dd>{{ appointment.patient.get_insurance_provider_display }}</dd>
+          <dt>District</dt><dd>{{ appointment.patient.district }}</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="card mb-4">
+      <div class="card-header"><h3 class="card-title">Recent history</h3></div>
+      <ul class="list-group list-group-flush">
+        {% for past in history %}
+          <li class="list-group-item">
+            <div class="fw-semibold">{{ past.diagnosis }}</div>
+            <small class="text-body-secondary">{{ past.appointment.appointment_date|date:"j M Y" }} &middot; {{ past.appointment.doctor }}</small>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-body-secondary">First visit, no previous records.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+{% extends "form_base.html" %}
+{% block title %}{% if object %}Edit doctor{% else %}New doctor{% endif %}{% endblock %}
+{% block page_title %}{% if object %}Edit {{ object }}{% else %}New doctor profile{% endif %}{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'staff:doctor_list' %}">Doctors</a></li><li class="breadcrumb-item active">{% if object %}Edit{% else %}New{% endif %}</li>{% endblock %}
+{% block card_title %}Doctor profile{% endblock %}
+{% block cancel_url %}{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'staff:doctor_list' %}{% endif %}{% endblock %}

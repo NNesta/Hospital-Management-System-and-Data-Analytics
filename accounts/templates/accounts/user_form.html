@@ -1,0 +1,6 @@
+{% extends "form_base.html" %}
+{% block title %}{% if account %}Edit user{% else %}New user{% endif %}{% endblock %}
+{% block page_title %}{% if account %}Edit {{ account.username }}{% else %}New user{% endif %}{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'accounts:user_list' %}">Users</a></li><li class="breadcrumb-item active">{% if account %}Edit{% else %}New{% endif %}</li>{% endblock %}
+{% block card_title %}{% if account %}Account details{% else %}Create a staff login{% endif %}{% endblock %}
+{% block cancel_url %}{% if account %}{{ account.get_absolute_url }}{% else %}{% url 'accounts:user_list' %}{% endif %}{% endblock %}

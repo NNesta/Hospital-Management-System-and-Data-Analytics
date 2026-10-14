@@ -1,0 +1,12 @@
+{% extends "confirm_delete_base.html" %}
+{% block title %}Cancel appointment{% endblock %}
+{% block page_title %}Cancel appointment{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'appointments:list' %}">Appointments</a></li><li class="breadcrumb-item active">Cancel</li>{% endblock %}
+{% block card_title %}Cancel this appointment?{% endblock %}
+{% block warning %}
+<p class="mb-1"><strong>{{ appointment.patient.full_name }}</strong> with {{ appointment.doctor }}</p>
+<p class="mb-0 text-body-secondary">{{ appointment.appointment_date|date:"l j F Y" }} at {{ appointment.appointment_time|time:"H:i" }} &middot; {{ appointment.reason }}</p>
+{% endblock %}
+{% block cancel_url %}{{ appointment.get_absolute_url }}{% endblock %}
+{% block confirm_icon %}x-circle{% endblock %}
+{% block confirm_label %}Yes, cancel it{% endblock %}

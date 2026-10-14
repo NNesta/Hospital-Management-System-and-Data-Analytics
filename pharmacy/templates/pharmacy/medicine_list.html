@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load hms_extras %}
+{% block title %}Medicines{% endblock %}
+{% block page_title %}Medicines &amp; stock{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item active">Medicines</li>{% endblock %}
+{% block content %}
+{% if low_stock_count and not low_only %}
+<div class="alert alert-danger d-flex align-items-center" role="alert">
+  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+  <div class="flex-grow-1">{{ low_stock_count }} medicine{{ low_stock_count|pluralize }} at or below the reorder level.</div>
+  <a href="?stock=low" class="btn btn-sm btn-danger">Show them</a>
+</div>
+{% endif %}
+<div class="card mb-4">
+  <div class="card-header d-flex flex-wrap gap-2 align-items-center">
+    <form method="get" class="d-flex flex-wrap gap-2 flex-grow-1 align-items-center" role="search">
+      <div class="input-group" style="max-width: 20rem">
+        <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Search medicine or generic name" aria-label="Search">
+        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+      </div>
+      <select name="category" class="form-select" style="max-width: 14rem" onchange="this.form.submit()" aria-label="Category">
+        <option value="">All categories</option>
+        {% for value, label in categories %}<option value="{{ value }}" {% if value == selected_category %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="stock" value="low" id="low-only" {% if low_only %}checked{% endif %} onchange="this.form.submit()">
+        <label class="form-check-label" for="low-only">Low stock only</label>
+      </div>
+    </form>
+    {% if user|has_role:"ADMIN,PHARMACIST" %}
+    <a href="{% url 'pharmacy:medicine_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>New medicine</a>
+    {% endif %}
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Medicine</th><th>Generic name</th><th>Category</th><th class="num">Unit price</th><th class="num">In stock</th><th class="num">Reorder at</th><th>Expiry</th><th></th></tr></thead>
+        <tbody>
+          {% for medicine in object_list %}
+          <tr>
+            <td><a href="{{ medicine.get_absolute_url }}">{{ medicine.name }}</a></td>
+            <td>{{ medicine.generic_name }}</td>
+            <td>{{ medicine.get_category_display }}</td>
+            <td class="num">{{ medicine.unit_price|rwf }}</td>
+            <td class="num">
+              {% if medicine.is_low_stock %}<span class="badge text-bg-danger" title="At or below reorder level"><i class="bi bi-exclamation-triangle-fill me-1"></i>{{ medicine.stock_quantity }}</span>
+              {% else %}{{ medicine.stock_quantity }}{% endif %}
+            </td>
+            <td class="num">{{ medicine.reorder_level }}</td>
+            <td>{% if medicine.is_expired %}<span class="badge text-bg-dark">Expired</span>{% else %}{{ medicine.expiry_date|date:"M Y" }}{% endif %}</td>
+            <td class="actions">
+              {% if user|has_role:"ADMIN,PHARMACIST" %}
+              <a href="{% url 'pharmacy:medicine_update' medicine.pk %}" class="btn btn-sm btn-outline-primary" title="Edit / restock"><i class="bi bi-pencil"></i></a>
+              <a href="{% url 'pharmacy:medicine_delete' medicine.pk %}" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></a>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="8" class="text-center text-body-secondary py-4">No medicines found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card-footer">{% include "partials/_pagination.html" %}</div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% load hms_extras %}
+<h2 class="h5 text-body-secondary text-uppercase mt-2 mb-3"><i class="bi bi-capsule me-2"></i>Pharmacy</h2>
+<div class="row">
+  <div class="col-lg-7">
+    {% include "analytics/_chart_card.html" with chart_id="medicineChart" title="Top 5 prescribed medicines" question="What drives pharmacy demand? Units prescribed, last 12 months." %}
+  </div>
+  <div class="col-lg-5">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h3 class="card-title">Low-stock medicines</h3>
+        {% if user|has_role:"ADMIN,PHARMACIST,DOCTOR" %}
+        <div class="card-tools"><a href="{% url 'pharmacy:medicine_list' %}?stock=low" class="btn btn-tool" title="Open list"><i class="bi bi-box-arrow-up-right"></i></a></div>
+        {% endif %}
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-sm table-hover mb-0">
+            <thead><tr><th class="ps-3">Medicine</th><th class="num">Stock</th><th class="num pe-3">Reorder at</th></tr></thead>
+            <tbody>
+              {% for medicine in low_stock %}
+              <tr>
+                <td class="ps-3">{% if user|has_role:"ADMIN,PHARMACIST,DOCTOR" %}<a href="{{ medicine.get_absolute_url }}">{{ medicine.name }}</a>{% else %}{{ medicine.name }}{% endif %}</td>
+                <td class="num"><span class="badge text-bg-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>{{ medicine.stock_quantity }}</span></td>
+                <td class="num pe-3">{{ medicine.reorder_level }}</td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="3" class="text-center text-body-secondary py-4">All medicines are above their reorder level.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

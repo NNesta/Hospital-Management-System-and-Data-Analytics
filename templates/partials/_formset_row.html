@@ -1,0 +1,15 @@
+<tr class="formset-row">
+  {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+  {% for field in form.visible_fields %}
+    {% if field.name != "DELETE" %}
+      <td>
+        {{ field }}
+        {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </td>
+    {% endif %}
+  {% endfor %}
+  <td class="text-center align-middle">
+    {% if form.DELETE %}{{ form.DELETE }}{% endif %}
+    {% for error in form.non_field_errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+  </td>
+</tr>

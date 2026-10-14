@@ -1,0 +1,5 @@
+{% extends "form_base.html" %}
+{% block title %}Edit medical record{% endblock %}
+{% block page_title %}Edit medical record{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'appointments:record_list' %}">Medical records</a></li><li class="breadcrumb-item active">Edit</li>{% endblock %}
+{% block card_title %}{{ object.appointment.patient.full_name }} &middot; {{ object.appointment.appointment_date|date:"j M Y" }}{% endblock %}

@@ -1,0 +1,22 @@
+{% comment %}
+  A chart in an AdminLTE card. The table button swaps the canvas for a data
+  table built from the same JSON (accessibility + exact values).
+  Params: chart_id, title, question, size ("sm" for shorter charts).
+{% endcomment %}
+<div class="card mb-4">
+  <div class="card-header">
+    <h3 class="card-title">{{ title }}</h3>
+    <div class="card-tools">
+      <button type="button" class="btn btn-tool" data-chart-table="{{ chart_id }}" title="Show as table" aria-pressed="false">
+        <i class="bi bi-table"></i><span class="visually-hidden">Show as table</span>
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+    <p class="text-body-secondary small mb-2">{{ question }}</p>
+    <div class="chart-box{% if size == 'sm' %} chart-box-sm{% endif %}" data-chart-box="{{ chart_id }}">
+      <canvas id="{{ chart_id }}" role="img" aria-label="{{ title }}"></canvas>
+    </div>
+    <div class="table-responsive d-none" data-table-for="{{ chart_id }}"></div>
+  </div>
+</div>

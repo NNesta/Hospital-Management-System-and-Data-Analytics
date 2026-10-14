@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}My profile{% endblock %}
+{% block page_title %}My profile{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item active">Profile</li>{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-4">
+    <div class="card card-primary card-outline mb-4">
+      <div class="card-body text-center">
+        <span class="avatar-initials profile-avatar bg-{{ user.role_color }}">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+        <h3 class="h5 mt-3 mb-1">{{ user.get_full_name|default:user.username }}</h3>
+        <span class="badge text-bg-{{ user.role_color }}">{{ user.get_role_display }}</span>
+      </div>
+      <div class="card-footer text-center">
+        <a href="{% url 'accounts:password_change' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-key me-1"></i>Change password</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="card mb-4">
+      <div class="card-header"><h3 class="card-title">Details</h3></div>
+      <div class="card-body">
+        <dl class="row detail-list mb-0">
+          <dt class="col-sm-4">Username</dt><dd class="col-sm-8">{{ user.username }}</dd>
+          <dt class="col-sm-4">Email</dt><dd class="col-sm-8">{{ user.email|default:"—" }}</dd>
+          <dt class="col-sm-4">Phone</dt><dd class="col-sm-8">{{ user.phone|default:"—" }}</dd>
+          <dt class="col-sm-4">Hospital</dt><dd class="col-sm-8">{{ HOSPITAL.NAME }}</dd>
+          {% if user.doctor_profile %}
+          <dt class="col-sm-4">Department</dt><dd class="col-sm-8">{{ user.doctor_profile.department }} &middot; {{ user.doctor_profile.specialization }}</dd>
+          {% endif %}
+        </dl>
+        <p class="text-body-secondary small mt-3 mb-0">To change your name, phone or role, ask an administrator.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

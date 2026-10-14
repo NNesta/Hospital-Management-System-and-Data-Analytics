@@ -1,0 +1,7 @@
+{% extends "form_base.html" %}
+{% block title %}{% if object %}Edit patient{% else %}Register patient{% endif %}{% endblock %}
+{% block page_title %}{% if object %}Edit {{ object.full_name }}{% else %}Register a patient{% endif %}{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'patients:list' %}">Patients</a></li><li class="breadcrumb-item active">{% if object %}Edit{% else %}Register{% endif %}</li>{% endblock %}
+{% block card_title %}{% if object %}{{ object.patient_code }} &middot; patient details{% else %}Patient details{% endif %}{% endblock %}
+{% block cancel_url %}{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'patients:list' %}{% endif %}{% endblock %}
+{% block submit_label %}{% if object %}Save changes{% else %}Register patient{% endif %}{% endblock %}

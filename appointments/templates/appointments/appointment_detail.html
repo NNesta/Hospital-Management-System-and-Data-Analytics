@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load hms_extras %}
+{% block title %}Appointment{% endblock %}
+{% block page_title %}Appointment &middot; {{ appointment.appointment_date|date:"j M Y" }}{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'appointments:list' %}">Appointments</a></li><li class="breadcrumb-item active">#{{ appointment.pk }}</li>{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-4">
+    <div class="card card-primary card-outline mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title">Visit</h3>
+        {% status_badge appointment %}
+      </div>
+      <div class="card-body">
+        <dl class="detail-list mb-0">
+          <dt>Patient</dt>
+          <dd><a href="{{ appointment.patient.get_absolute_url }}">{{ appointment.patient.full_name }}</a> <small class="text-body-secondary">{{ appointment.patient.patient_code }} &middot; {{ appointment.patient.age }} yrs</small></dd>
+          <dt>Doctor</dt><dd>{{ appointment.doctor }} &middot; {{ appointment.doctor.department.name }}</dd>
+          <dt>When</dt><dd>{{ appointment.appointment_date|date:"l j F Y" }} at {{ appointment.appointment_time|time:"H:i" }}</dd>
+          <dt>Reason</dt><dd>{{ appointment.reason }}</dd>
+          <dt>Booked</dt><dd>{{ appointment.created_at|date:"j M Y, H:i" }}{% if appointment.created_by %} by {{ appointment.created_by }}{% endif %}</dd>
+        </dl>
+      </div>
+      <div class="card-footer d-grid gap-2">
+        {% if appointment.is_scheduled %}
+          {% if user.role == "DOCTOR" and is_own %}
+            <a href="{% url 'appointments:complete' appointment.pk %}" class="btn btn-success"><i class="bi bi-clipboard2-pulse me-1"></i>Start consultation</a>
+          {% endif %}
+          {% if user|has_role:"ADMIN,RECEPTIONIST" %}
+            <a href="{% url 'appointments:update' appointment.pk %}" class="btn btn-outline-primary"><i class="bi bi-calendar-event me-1"></i>Reschedule</a>
+            <form method="post" action="{% url 'appointments:no_show' appointment.pk %}" class="d-grid">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-warning"><i class="bi bi-person-dash me-1"></i>Mark as no-show</button>
+            </form>
+            <a href="{% url 'appointments:cancel' appointment.pk %}" class="btn btn-outline-danger"><i class="bi bi-x-circle me-1"></i>Cancel appointment</a>
+          {% endif %}
+        {% endif %}
+        {% if appointment.is_completed and record and user.role == "DOCTOR" and is_own %}
+          <a href="{% url 'pharmacy:prescription_create' record.pk %}" class="btn btn-primary"><i class="bi bi-prescription2 me-1"></i>Write prescription</a>
+        {% endif %}
+        {% if invoice and user|has_role:"ADMIN,ACCOUNTANT,RECEPTIONIST" %}
+          <a href="{{ invoice.get_absolute_url }}" class="btn btn-outline-secondary"><i class="bi bi-receipt me-1"></i>Invoice {{ invoice.invoice_number }}</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title"><i class="bi bi-journal-medical me-2"></i>Consultation record</h3>
+        {% if record and user.role == "DOCTOR" and is_own %}
+          <a href="{% url 'appointments:record_update' record.pk %}" class="btn btn-sm btn-outline-primary ms-auto"><i class="bi bi-pencil me-1"></i>Edit</a>
+        {% endif %}
+      </div>
+      <div class="card-body">
+        {% if record and user|has_role:"ADMIN,DOCTOR" %}
+          <dl class="row detail-list mb-0">
+            <dt class="col-sm-3">Diagnosis</dt><dd class="col-sm-9"><strong>{{ record.diagnosis }}</strong></dd>
+            <dt class="col-sm-3">Symptoms</dt><dd class="col-sm-9">{{ record.symptoms|linebreaksbr }}</dd>
+            <dt class="col-sm-3">Treatment plan</dt><dd class="col-sm-9">{{ record.treatment_plan|linebreaksbr }}</dd>
+            {% if record.notes %}<dt class="col-sm-3">Notes</dt><dd class="col-sm-9">{{ record.notes|linebreaksbr }}</dd>{% endif %}
+            <dt class="col-sm-3">Follow-up</dt><dd class="col-sm-9">{{ record.follow_up_date|date:"j M Y"|default:"None planned" }}</dd>
+          </dl>
+        {% elif record %}
+          <p class="text-body-secondary mb-0"><i class="bi bi-lock me-1"></i>Consultation completed. Clinical notes are visible to doctors and administrators only.</p>
+        {% elif appointment.is_scheduled %}
+          <p class="text-body-secondary mb-0">The doctor will write the medical record during the consultation.</p>
+        {% else %}
+          <p class="text-body-secondary mb-0">No consultation took place for this appointment.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if record and user|has_role:"ADMIN,DOCTOR" %}
+    <div class="card mb-4">
+      <div class="card-header"><h3 class="card-title"><i class="bi bi-prescription2 me-2"></i>Prescriptions</h3></div>
+      <div class="card-body p-0">
+        <table class="table mb-0">
+          <thead><tr><th>Prescription</th><th>Medicines</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for rx in prescriptions %}
+            <tr>
+              <td><a href="{{ rx.get_absolute_url }}">{{ rx.code }}</a></td>
+              <td>{% for item in rx.items.all %}{{ item.medicine.name }} &times; {{ item.quantity }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</td>
+              <td>{% status_badge rx %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-center text-body-secondary py-3">No prescriptions.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page not found | Ubuzima HMS</title>
+  <script src="{% static 'js/theme.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/bootstrap-icons.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/adminlte/css/adminlte.min.css' %}">
+</head>
+<body class="bg-body-tertiary">
+<main class="d-flex align-items-center min-vh-100 py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6 text-center">
+        <div class="display-1 fw-bold text-primary lh-1 mb-3">404</div>
+        <h1 class="h3 mb-3">Oops! Page not found.</h1>
+        <p class="text-secondary mb-4">
+          We could not find the page you were looking for. It may have been moved,
+          or the record may no longer exist.
+        </p>
+        <a href="/" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to dashboard</a>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

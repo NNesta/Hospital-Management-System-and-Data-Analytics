@@ -1,0 +1,16 @@
+{% extends "form_base.html" %}
+{% load hms_extras %}
+{% block title %}Payment{% endblock %}
+{% block page_title %}{% if object %}Edit payment{% else %}Record a payment{% endif %}{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'billing:invoice_list' %}">Invoices</a></li><li class="breadcrumb-item"><a href="{{ invoice.get_absolute_url }}">{{ invoice.invoice_number }}</a></li><li class="breadcrumb-item active">Payment</li>{% endblock %}
+{% block card_title %}{{ invoice.invoice_number }} &middot; {{ invoice.patient.full_name }}{% endblock %}
+{% block form_body %}
+  <div class="row g-3 mb-3">
+    <div class="col-sm-4"><div class="border rounded p-2"><small class="text-body-secondary d-block">Total</small><strong>{{ invoice.total|rwf }}</strong></div></div>
+    <div class="col-sm-4"><div class="border rounded p-2"><small class="text-body-secondary d-block">Paid so far</small><strong>{{ invoice.amount_paid|rwf }}</strong></div></div>
+    <div class="col-sm-4"><div class="border rounded p-2 border-danger-subtle"><small class="text-body-secondary d-block">Balance</small><strong>{{ invoice.balance|rwf }}</strong></div></div>
+  </div>
+  {% include "partials/_form_fields.html" %}
+{% endblock %}
+{% block cancel_url %}{{ invoice.get_absolute_url }}{% endblock %}
+{% block submit_label %}Save payment{% endblock %}

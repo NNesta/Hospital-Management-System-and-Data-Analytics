@@ -1,0 +1,6 @@
+{% extends "confirm_delete_base.html" %}
+{% block page_title %}Delete prescription{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'pharmacy:prescription_list' %}">Prescriptions</a></li><li class="breadcrumb-item active">Delete</li>{% endblock %}
+{% block warning %}
+<p class="mb-0">Delete <strong>{{ object.code }}</strong> for {{ object.patient.full_name }}? Its medicine lines are deleted too.</p>
+{% endblock %}

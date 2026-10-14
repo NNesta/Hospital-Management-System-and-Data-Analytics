@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load hms_extras %}
+{% block title %}{{ invoice.invoice_number }}{% endblock %}
+{% block page_title %}Invoice {{ invoice.invoice_number }}{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'billing:invoice_list' %}">Invoices</a></li><li class="breadcrumb-item active">{{ invoice.invoice_number }}</li>{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card card-primary card-outline mb-4">
+      <div class="card-header d-flex align-items-center">
+        <h3 class="card-title">Items</h3>
+        <span class="ms-auto">{% status_badge invoice %}{% if invoice.is_overdue %} <span class="badge text-bg-danger">Overdue</span>{% endif %}</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table mb-0">
+            <thead><tr><th>Type</th><th>Description</th><th class="num">Qty</th><th class="num">Unit price</th><th class="num">Amount</th></tr></thead>
+            <tbody>
+              {% for item in invoice.items.all %}
+              <tr>
+                <td><span class="badge text-bg-light border">{{ item.get_item_type_display }}</span></td>
+                <td>{{ item.description }}</td>
+                <td class="num">{{ item.quantity }}</td>
+                <td class="num">{{ item.unit_price|rwf }}</td>
+                <td class="num">{{ item.line_total|rwf }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot>
+              <tr><th colspan="4" class="text-end">Total</th><th class="num">{{ invoice.total|rwf }}</th></tr>
+              <tr><td colspan="4" class="text-end text-body-secondary">Paid</td><td class="num text-body-secondary">{{ invoice.amount_paid|rwf }}</td></tr>
+              <tr><th colspan="4" class="text-end">Balance due</th><th class="num fs-5">{{ invoice.balance|rwf }}</th></tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header d-flex align-items-center">
+        <h3 class="card-title">Payments</h3>
+        {% if user|has_role:"ADMIN,ACCOUNTANT" and invoice.status != "PAID" %}
+        <a href="{% url 'billing:payment_create' invoice.pk %}" class="btn btn-sm btn-success ms-auto"><i class="bi bi-cash-coin me-1"></i>Record payment</a>
+        {% endif %}
+      </div>
+      <div class="card-body p-0">
+        <table class="table mb-0">
+          <thead><tr><th>Paid at</th><th>Method</th><th>Reference</th><th>Received by</th><th class="num">Amount</th></tr></thead>
+          <tbody>
+            {% for payment in invoice.payments.all %}
+            <tr>
+              <td>{% if user|has_role:"ADMIN,ACCOUNTANT" %}<a href="{{ payment.get_absolute_url }}">{{ payment.paid_at|date:"j M Y, H:i" }}</a>{% else %}{{ payment.paid_at|date:"j M Y, H:i" }}{% endif %}</td>
+              <td>{{ payment.get_method_display }}</td>
+              <td><code>{{ payment.reference|default:"—" }}</code></td>
+              <td>{{ payment.received_by|default:"—" }}</td>
+              <td class="num">{{ payment.amount|rwf }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center text-body-secondary py-3">No payments yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card mb-4">
+      <div class="card-header"><h3 class="card-title">Details</h3></div>
+      <div class="card-body">
+        <dl class="detail-list mb-0">
+          <dt>Patient</dt><dd><a href="{{ invoice.patient.get_absolute_url }}">{{ invoice.patient.full_name }}</a> <small class="text-body-secondary">{{ invoice.patient.patient_code }}</small></dd>
+          <dt>Insurance</dt><dd>{{ invoice.patient.get_insurance_provider_display }}</dd>
+          {% if invoice.appointment %}<dt>Visit</dt><dd>{{ invoice.appointment.appointment_date|date:"j M Y" }} &middot; {{ invoice.appointment.doctor }}</dd>{% endif %}
+          <dt>Issued / due</dt><dd>{{ invoice.issue_date|date:"j M Y" }} &rarr; {{ invoice.due_date|date:"j M Y" }}</dd>
+          <dt>Created by</dt><dd>{{ invoice.created_by|default:"—" }}</dd>
+          {% if invoice.notes %}<dt>Notes</dt><dd>{{ invoice.notes }}</dd>{% endif %}
+        </dl>
+      </div>
+      <div class="card-footer d-grid gap-2">
+        <a href="{% url 'billing:print' invoice.pk %}" class="btn btn-outline-secondary"><i class="bi bi-printer me-1"></i>Printable invoice</a>
+        {% if user|has_role:"ADMIN,ACCOUNTANT" and invoice.status == "UNPAID" %}
+        <a href="{% url 'billing:invoice_update' invoice.pk %}" class="btn btn-outline-primary"><i class="bi bi-pencil me-1"></i>Edit invoice</a>
+        {% endif %}
+        {% if user.role == "ADMIN" and not invoice.payments.all %}
+        <a href="{% url 'billing:invoice_delete' invoice.pk %}" class="btn btn-outline-danger"><i class="bi bi-trash me-1"></i>Delete</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

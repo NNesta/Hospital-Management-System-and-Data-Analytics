@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load hms_extras %}
+{% block title %}{{ doctor }}{% endblock %}
+{% block page_title %}{{ doctor }}{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'staff:doctor_list' %}">Doctors</a></li><li class="breadcrumb-item active">{{ doctor.user.last_name }}</li>{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-4">
+    <div class="card card-success card-outline mb-4">
+      <div class="card-body text-center">
+        <span class="avatar-initials profile-avatar bg-success">{{ doctor.user.first_name|first|upper }}{{ doctor.user.last_name|first|upper }}</span>
+        <h3 class="h5 mt-3 mb-1">{{ doctor }}</h3>
+        <div class="text-body-secondary">{{ doctor.specialization }}</div>
+        <div class="mt-2">
+          {% if not doctor.is_active %}<span class="badge text-bg-secondary">Inactive</span>
+          {% elif doctor.is_available %}<span class="badge text-bg-success">Available</span>
+          {% else %}<span class="badge text-bg-warning">Unavailable</span>{% endif %}
+        </div>
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between"><span>Department</span><a href="{{ doctor.department.get_absolute_url }}">{{ doctor.department }}</a></li>
+        <li class="list-group-item d-flex justify-content-between"><span>RMDC licence</span><code>{{ doctor.license_number }}</code></li>
+        <li class="list-group-item d-flex justify-content-between"><span>Phone</span><span>{{ doctor.phone }}</span></li>
+        <li class="list-group-item d-flex justify-content-between"><span>Email</span><span>{{ doctor.user.email|default:"—" }}</span></li>
+        <li class="list-group-item d-flex justify-content-between"><span>Consultation fee</span><strong>{{ doctor.consultation_fee|rwf }}</strong></li>
+      </ul>
+      {% if user|has_role:"ADMIN" %}
+      <div class="card-footer d-flex gap-2">
+        <a href="{% url 'staff:doctor_update' doctor.pk %}" class="btn btn-sm btn-primary"><i class="bi bi-pencil me-1"></i>Edit</a>
+        {% if doctor.is_active %}<a href="{% url 'staff:doctor_delete' doctor.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-person-x me-1"></i>Deactivate</a>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="row">
+      <div class="col-sm-4"><div class="info-box mb-3"><span class="info-box-icon text-bg-primary"><i class="bi bi-calendar2-check"></i></span><div class="info-box-content"><span class="info-box-text">Appointments</span><span class="info-box-number">{{ stats.total }}</span></div></div></div>
+      <div class="col-sm-4"><div class="info-box mb-3"><span class="info-box-icon text-bg-success"><i class="bi bi-check2-circle"></i></span><div class="info-box-content"><span class="info-box-text">Completed</span><span class="info-box-number">{{ stats.completed }}</span></div></div></div>
+      <div class="col-sm-4"><div class="info-box mb-3"><span class="info-box-icon text-bg-info"><i class="bi bi-people"></i></span><div class="info-box-content"><span class="info-box-text">Patients seen</span><span class="info-box-number">{{ stats.patients }}</span></div></div></div>
+    </div>
+    <div class="card mb-4">
+      <div class="card-header"><h3 class="card-title">Upcoming appointments</h3></div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead><tr><th>Date</th><th>Time</th><th>Patient</th><th>Reason</th></tr></thead>
+          <tbody>
+            {% for appt in upcoming %}
+            <tr>
+              <td>{{ appt.appointment_date|date:"D j M" }}</td>
+              <td>{{ appt.appointment_time|time:"H:i" }}</td>
+              <td>{{ appt.patient.full_name }}</td>
+              <td>{{ appt.reason|truncatechars:40 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center text-body-secondary py-4">No upcoming appointments.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

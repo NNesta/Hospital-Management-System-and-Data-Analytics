@@ -1,0 +1,11 @@
+{% extends "form_base.html" %}
+{% block title %}{% if object %}Reschedule{% else %}Book appointment{% endif %}{% endblock %}
+{% block page_title %}{% if object %}Reschedule appointment{% else %}Book an appointment{% endif %}{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'appointments:list' %}">Appointments</a></li><li class="breadcrumb-item active">{% if object %}Reschedule{% else %}Book{% endif %}</li>{% endblock %}
+{% block card_title %}{% if object %}Choose a new slot{% else %}Appointment details{% endif %}{% endblock %}
+{% block form_body %}
+  <p class="text-body-secondary small">Clinic slots run every 30 minutes from 08:00 to 16:30. A doctor cannot be booked twice for the same slot.</p>
+  {% include "partials/_form_fields.html" %}
+{% endblock %}
+{% block cancel_url %}{% if object %}{{ object.get_absolute_url }}{% elif form.initial.patient %}{{ form.initial.patient.get_absolute_url }}{% else %}{% url 'appointments:list' %}{% endif %}{% endblock %}
+{% block submit_label %}{% if object %}Save new time{% else %}Book appointment{% endif %}{% endblock %}

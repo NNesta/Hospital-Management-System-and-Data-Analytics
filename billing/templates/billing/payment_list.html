@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load hms_extras %}
+{% block title %}Payments{% endblock %}
+{% block page_title %}Payments{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item active">Payments</li>{% endblock %}
+{% block content %}
+<div class="card mb-4">
+  <div class="card-header">
+    <form method="get" class="d-flex flex-wrap gap-2" role="search">
+      <div class="input-group" style="max-width: 22rem">
+        <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Reference, invoice or patient" aria-label="Search">
+        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+      </div>
+      <select name="method" class="form-select" style="max-width: 18rem" onchange="this.form.submit()" aria-label="Method">
+        <option value="">All methods</option>
+        {% for value, label in method_choices %}<option value="{{ value }}" {% if value == selected_method %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </form>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Paid at</th><th>Invoice</th><th>Patient</th><th>Method</th><th>Reference</th><th>Received by</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+          {% for payment in object_list %}
+          <tr>
+            <td><a href="{{ payment.get_absolute_url }}">{{ payment.paid_at|date:"j M Y, H:i" }}</a></td>
+            <td><a href="{{ payment.invoice.get_absolute_url }}">{{ payment.invoice.invoice_number }}</a></td>
+            <td>{{ payment.invoice.patient.full_name }}</td>
+            <td>{{ payment.get_method_display }}</td>
+            <td><code>{{ payment.reference|default:"—" }}</code></td>
+            <td>{{ payment.received_by|default:"—" }}</td>
+            <td class="num">{{ payment.amount|rwf }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="text-center text-body-secondary py-4">No payments found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card-footer">{% include "partials/_pagination.html" %}</div>
+</div>
+{% endblock %}

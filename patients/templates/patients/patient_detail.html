@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load hms_extras %}
+{% block title %}{{ patient.full_name }}{% endblock %}
+{% block page_title %}{{ patient.full_name }}{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'patients:list' %}">Patients</a></li><li class="breadcrumb-item active">{{ patient.patient_code }}</li>{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-3">
+    <div class="card card-primary card-outline mb-4">
+      <div class="card-body text-center">
+        <span class="avatar-initials profile-avatar {% if patient.gender == 'F' %}bg-danger-subtle text-danger-emphasis{% else %}bg-primary-subtle text-primary-emphasis{% endif %}">{{ patient.first_name|first|upper }}{{ patient.last_name|first|upper }}</span>
+        <h3 class="h5 mt-3 mb-0">{{ patient.full_name }}</h3>
+        <code>{{ patient.patient_code }}</code>
+        <div class="text-body-secondary small mt-1">{{ patient.get_gender_display }} &middot; {{ patient.age }} years &middot; {{ patient.get_blood_group_display }}</div>
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between"><span>Visits</span><strong>{{ appointments|length }}</strong></li>
+        <li class="list-group-item d-flex justify-content-between"><span>Insurance</span><span>{{ patient.insurance_provider }}</span></li>
+      </ul>
+      <div class="card-footer d-grid gap-2">
+        {% if user|has_role:"ADMIN,RECEPTIONIST" %}
+        <a href="{% url 'appointments:create' %}?patient={{ patient.pk }}" class="btn btn-success btn-sm"><i class="bi bi-calendar-plus me-1"></i>Book appointment</a>
+        <a href="{% url 'patients:update' patient.pk %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil me-1"></i>Edit details</a>
+        {% endif %}
+        {% if user|has_role:"ADMIN" %}
+        <a href="{% url 'patients:delete' patient.pk %}" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash me-1"></i>Delete</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-9">
+    <div class="card mb-4">
+      <div class="card-header p-2">
+        <ul class="nav nav-pills" role="tablist">
+          <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-info" type="button" role="tab">Info</button></li>
+          <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-appointments" type="button" role="tab">Appointments <span class="badge text-bg-secondary">{{ appointments|length }}</span></button></li>
+          {% if records is not None %}
+          <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-records" type="button" role="tab">Medical history <span class="badge text-bg-secondary">{{ records|length }}</span></button></li>
+          {% endif %}
+          {% if invoices is not None %}
+          <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-invoices" type="button" role="tab">Invoices <span class="badge text-bg-secondary">{{ invoices|length }}</span></button></li>
+          {% endif %}
+        </ul>
+      </div>
+      <div class="card-body">
+        <div class="tab-content">
+          <div class="tab-pane fade show active" id="tab-info" role="tabpanel">
+            <div class="row">
+              <div class="col-md-6">
+                <h4 class="h6 text-uppercase text-body-secondary">Identity</h4>
+                <dl class="row detail-list">
+                  <dt class="col-5">National ID</dt><dd class="col-7">{{ patient.national_id|default:"— (minor)" }}</dd>
+                  <dt class="col-5">Date of birth</dt><dd class="col-7">{{ patient.date_of_birth|date:"j M Y" }}</dd>
+                  <dt class="col-5">Blood group</dt><dd class="col-7">{{ patient.get_blood_group_display }}</dd>
+                  <dt class="col-5">Insurance</dt><dd class="col-7">{{ patient.get_insurance_provider_display }}{% if patient.insurance_number %}<br><code>{{ patient.insurance_number }}</code>{% endif %}</dd>
+                </dl>
+              </div>
+              <div class="col-md-6">
+                <h4 class="h6 text-uppercase text-body-secondary">Contact</h4>
+                <dl class="row detail-list">
+                  <dt class="col-5">Phone</dt><dd class="col-7">{{ patient.phone }}</dd>
+                  <dt class="col-5">Email</dt><dd class="col-7">{{ patient.email|default:"—" }}</dd>
+                  <dt class="col-5">Address</dt><dd class="col-7">{{ patient.address }}<br>{{ patient.district }} District, {{ patient.province }}</dd>
+                  <dt class="col-5">Emergency</dt><dd class="col-7">{{ patient.emergency_contact_name }}<br>{{ patient.emergency_contact_phone }}</dd>
+                </dl>
+              </div>
+            </div>
+            <p class="small text-body-secondary mb-0">Registered {{ patient.created_at|date:"j M Y, H:i" }}{% if patient.registered_by %} by {{ patient.registered_by }}{% endif %}.</p>
+          </div>
+
+          <div class="tab-pane fade" id="tab-appointments" role="tabpanel">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead><tr><th>Date</th><th>Time</th><th>Doctor</th><th>Department</th><th>Reason</th><th>Status</th></tr></thead>
+                <tbody>
+                  {% for appt in appointments %}
+                  <tr>
+                    <td>{% if user|has_role:"ADMIN,RECEPTIONIST,DOCTOR" %}<a href="{{ appt.get_absolute_url }}">{{ appt.appointment_date|date:"j M Y" }}</a>{% else %}{{ appt.appointment_date|date:"j M Y" }}{% endif %}</td>
+                    <td>{{ appt.appointment_time|time:"H:i" }}</td>
+                    <td>{{ appt.doctor }}</td>
+                    <td>{{ appt.doctor.department.name }}</td>
+                    <td>{{ appt.reason|truncatechars:40 }}</td>
+                    <td>{% status_badge appt %}</td>
+                  </tr>
+                  {% empty %}
+                  <tr><td colspan="6" class="text-center text-body-secondary py-4">No appointments yet.</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {% if records is not None %}
+          <div class="tab-pane fade" id="tab-records" role="tabpanel">
+            {% for appt in records %}
+              <div class="border-start border-3 border-success ps-3 mb-3">
+                <div class="d-flex justify-content-between flex-wrap">
+                  <strong><a href="{{ appt.medical_record.get_absolute_url }}">{{ appt.medical_record.diagnosis }}</a></strong>
+                  <small class="text-body-secondary">{{ appt.appointment_date|date:"j M Y" }} &middot; {{ appt.doctor }}</small>
+                </div>
+                <div class="small text-body-secondary">{{ appt.medical_record.symptoms|truncatechars:140 }}</div>
+              </div>
+            {% empty %}
+              <p class="text-center text-body-secondary py-4 mb-0">No medical records yet.</p>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          {% if invoices is not None %}
+          <div class="tab-pane fade" id="tab-invoices" role="tabpanel">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead><tr><th>Invoice</th><th>Issued</th><th class="num">Total</th><th class="num">Paid</th><th class="num">Balance</th><th>Status</th></tr></thead>
+                <tbody>
+                  {% for invoice in invoices %}
+                  <tr>
+                    <td><a href="{{ invoice.get_absolute_url }}">{{ invoice.invoice_number }}</a></td>
+                    <td>{{ invoice.issue_date|date:"j M Y" }}</td>
+                    <td class="num">{{ invoice.total|rwf }}</td>
+                    <td class="num">{{ invoice.amount_paid|rwf }}</td>
+                    <td class="num">{{ invoice.balance|rwf }}</td>
+                    <td>{% status_badge invoice %}</td>
+                  </tr>
+                  {% empty %}
+                  <tr><td colspan="6" class="text-center text-body-secondary py-4">No invoices yet.</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

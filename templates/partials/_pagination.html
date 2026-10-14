@@ -1,0 +1,35 @@
+{% load hms_extras %}
+{% if page_obj %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <small class="text-body-secondary">
+    Showing {{ page_obj.start_index }}&ndash;{{ page_obj.end_index }} of {{ page_obj.paginator.count }}
+  </small>
+  {% if page_obj.has_other_pages %}
+  <nav aria-label="Pagination">
+    <ul class="pagination pagination-sm m-0">
+      {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="{% querystring page=page_obj.previous_page_number %}" aria-label="Previous">&laquo;</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+      {% endif %}
+      {% elided_pages page_obj as pages %}
+      {% for num in pages %}
+        {% if num == page_obj.paginator.ELLIPSIS %}
+          <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+        {% elif num == page_obj.number %}
+          <li class="page-item active" aria-current="page"><span class="page-link">{{ num }}</span></li>
+        {% else %}
+          {# {% querystring %} keeps ?q= and every other filter while changing the page #}
+          <li class="page-item"><a class="page-link" href="{% querystring page=num %}">{{ num }}</a></li>
+        {% endif %}
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="{% querystring page=page_obj.next_page_number %}" aria-label="Next">&raquo;</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+{% endif %}

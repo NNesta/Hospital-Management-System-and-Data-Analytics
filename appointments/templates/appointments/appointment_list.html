@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load hms_extras %}
+{% block title %}Appointments{% endblock %}
+{% block page_title %}{% if user.role == "DOCTOR" %}My appointments{% else %}Appointments{% endif %}{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item active">Appointments</li>{% endblock %}
+{% block content %}
+<div class="card mb-4">
+  <div class="card-header d-flex flex-wrap gap-2 align-items-center">
+    <form method="get" class="d-flex flex-wrap gap-2 flex-grow-1 align-items-center" role="search">
+      <div class="input-group" style="max-width: 20rem">
+        <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Patient, doctor or reason" aria-label="Search">
+        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+      </div>
+      <select name="when" class="form-select" style="max-width: 10rem" onchange="this.form.submit()" aria-label="When">
+        {% for value, label in filter_form.fields.when.choices %}<option value="{{ value }}" {% if value == filter_form.when.value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+      <select name="status" class="form-select" style="max-width: 10rem" onchange="this.form.submit()" aria-label="Status">
+        {% for value, label in filter_form.fields.status.choices %}<option value="{{ value }}" {% if value == filter_form.status.value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+      <input type="date" name="date" value="{{ filter_form.date.value|default:'' }}" class="form-control" style="max-width: 11rem" onchange="this.form.submit()" aria-label="Date">
+      {% if request.GET %}<a href="{% url 'appointments:list' %}" class="btn btn-link">Clear</a>{% endif %}
+    </form>
+    {% if user|has_role:"ADMIN,RECEPTIONIST" %}
+    <a href="{% url 'appointments:create' %}" class="btn btn-primary"><i class="bi bi-calendar-plus me-1"></i>Book appointment</a>
+    {% endif %}
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Date</th><th>Time</th><th>Patient</th><th>Doctor</th><th>Department</th><th>Reason</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          {% for appt in object_list %}
+          <tr>
+            <td><a href="{{ appt.get_absolute_url }}">{{ appt.appointment_date|date:"D j M Y" }}</a></td>
+            <td>{{ appt.appointment_time|time:"H:i" }}</td>
+            <td>{{ appt.patient.full_name }} <small class="text-body-secondary">{{ appt.patient.patient_code }}</small></td>
+            <td>{{ appt.doctor }}</td>
+            <td>{{ appt.doctor.department.name }}</td>
+            <td>{{ appt.reason|truncatechars:35 }}</td>
+            <td>{% status_badge appt %}</td>
+            <td class="actions">
+              {% if appt.is_scheduled %}
+                {% if user.role == "DOCTOR" %}
+                <a href="{% url 'appointments:complete' appt.pk %}" class="btn btn-sm btn-success" title="Start consultation"><i class="bi bi-clipboard2-pulse"></i></a>
+                {% elif user|has_role:"ADMIN,RECEPTIONIST" %}
+                <a href="{% url 'appointments:update' appt.pk %}" class="btn btn-sm btn-outline-primary" title="Reschedule"><i class="bi bi-calendar-event"></i></a>
+                <a href="{% url 'appointments:cancel' appt.pk %}" class="btn btn-sm btn-outline-danger" title="Cancel"><i class="bi bi-x-circle"></i></a>
+                {% endif %}
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="8" class="text-center text-body-secondary py-4">No appointments match these filters.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card-footer">{% include "partials/_pagination.html" %}</div>
+</div>
+{% endblock %}

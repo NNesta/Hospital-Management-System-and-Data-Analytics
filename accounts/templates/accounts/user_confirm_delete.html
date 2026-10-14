@@ -1,0 +1,11 @@
+{% extends "confirm_delete_base.html" %}
+{% block page_title %}Deactivate user{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'accounts:user_list' %}">Users</a></li><li class="breadcrumb-item active">Deactivate</li>{% endblock %}
+{% block card_title %}Deactivate {{ account }}?{% endblock %}
+{% block warning %}
+<p><strong>{{ account }}</strong> ({{ account.get_role_display }}) will no longer be able to sign in.</p>
+<p class="mb-0 text-body-secondary">The account is kept so that patients, appointments and payments they recorded keep their history. You can re-activate it later from the edit page.</p>
+{% endblock %}
+{% block cancel_url %}{{ account.get_absolute_url }}{% endblock %}
+{% block confirm_icon %}person-x{% endblock %}
+{% block confirm_label %}Yes, deactivate{% endblock %}

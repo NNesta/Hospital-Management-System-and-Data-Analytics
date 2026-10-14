@@ -1,0 +1,36 @@
+{% load hms_extras %}
+<h2 class="h5 text-body-secondary text-uppercase mt-2 mb-3"><i class="bi bi-cash-coin me-2"></i>Finance</h2>
+<div class="row">
+  <div class="col-lg-7">
+    {% include "analytics/_chart_card.html" with chart_id="revenueChart" title="Revenue per month" question="Is income rising or falling? Payments received, in RWF." %}
+  </div>
+  <div class="col-lg-5">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h3 class="card-title">Five largest unpaid balances</h3>
+        {% if user|has_role:"ADMIN,ACCOUNTANT,RECEPTIONIST" %}
+        <div class="card-tools"><a href="{% url 'billing:invoice_list' %}?status=UNPAID" class="btn btn-tool" title="Open list"><i class="bi bi-box-arrow-up-right"></i></a></div>
+        {% endif %}
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-sm table-hover mb-0">
+            <thead><tr><th class="ps-3">Invoice</th><th>Patient</th><th class="num pe-3">Balance</th></tr></thead>
+            <tbody>
+              {% for invoice in unpaid_invoices %}
+              <tr>
+                <td class="ps-3">{% if user|has_role:"ADMIN,ACCOUNTANT,RECEPTIONIST" %}<a href="{{ invoice.get_absolute_url }}">{{ invoice.invoice_number }}</a>{% else %}{{ invoice.invoice_number }}{% endif %}
+                  {% status_badge invoice %}</td>
+                <td>{{ invoice.patient.full_name }}</td>
+                <td class="num pe-3 fw-semibold">{{ invoice.balance_amount|rwf }}</td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="3" class="text-center text-body-secondary py-4">No outstanding invoices.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

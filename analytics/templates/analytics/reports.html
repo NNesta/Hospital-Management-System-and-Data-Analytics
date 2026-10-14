@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load hms_extras humanize %}
+{% block title %}Reports{% endblock %}
+{% block page_title %}Reports{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item active">Reports</li>{% endblock %}
+{% block content %}
+<div class="card card-primary card-outline mb-4">
+  <div class="card-header"><h3 class="card-title"><i class="bi bi-funnel me-2"></i>Filters</h3></div>
+  <form method="get" novalidate>
+    <div class="card-body">
+      {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+      <div class="row g-3">
+        {% for field in form %}
+        <div class="col-md col-sm-6">
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="card-footer d-flex flex-wrap gap-2 justify-content-end">
+      <a href="{% url 'analytics:reports' %}" class="btn btn-outline-secondary">Reset</a>
+      <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>Apply filters</button>
+      <a href="{% url 'analytics:export_csv' %}{% if querystring %}?{{ querystring }}{% endif %}" class="btn btn-success"><i class="bi bi-filetype-csv me-1"></i>Download CSV</a>
+    </div>
+  </form>
+</div>
+
+<div class="row">
+  <div class="col-lg-3 col-sm-6">
+    <div class="info-box mb-3"><span class="info-box-icon text-bg-primary"><i class="bi bi-calendar2-week"></i></span>
+      <div class="info-box-content"><span class="info-box-text">Appointments</span><span class="info-box-number">{{ totals.total|intcomma }}</span></div></div>
+  </div>
+  <div class="col-lg-3 col-sm-6">
+    <div class="info-box mb-3"><span class="info-box-icon text-bg-success"><i class="bi bi-check2-circle"></i></span>
+      <div class="info-box-content"><span class="info-box-text">Completion rate</span><span class="info-box-number">{{ totals.completion_rate }}%</span></div></div>
+  </div>
+  <div class="col-lg-3 col-sm-6">
+    <div class="info-box mb-3"><span class="info-box-icon text-bg-warning"><i class="bi bi-person-dash"></i></span>
+      <div class="info-box-content"><span class="info-box-text">No-show rate</span><span class="info-box-number">{{ totals.no_show_rate }}%</span></div></div>
+  </div>
+  <div class="col-lg-3 col-sm-6">
+    <div class="info-box mb-3"><span class="info-box-icon text-bg-info"><i class="bi bi-cash-coin"></i></span>
+      <div class="info-box-content"><span class="info-box-text">Collected / billed</span><span class="info-box-number">{{ totals.collection_rate }}%</span></div></div>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header">
+    <h3 class="card-title">Summary by doctor</h3>
+    <div class="card-tools text-body-secondary small">The CSV has one row per appointment.</div>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover table-sm mb-0">
+        <thead>
+          <tr>
+            <th class="ps-3">Department</th><th>Doctor</th>
+            <th class="num">Appointments</th><th class="num">Completed</th><th class="num">Scheduled</th>
+            <th class="num">Cancelled</th><th class="num">No-show</th><th class="num">Completion</th>
+            <th class="num">Billed</th><th class="num pe-3">Collected</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in summary %}
+          <tr>
+            <td class="ps-3">{{ row.department }}</td>
+            <td>{{ row.doctor }}</td>
+            <td class="num">{{ row.total }}</td>
+            <td class="num">{{ row.completed }}</td>
+            <td class="num">{{ row.scheduled }}</td>
+            <td class="num">{{ row.cancelled }}</td>
+            <td class="num">{{ row.no_show }}</td>
+            <td class="num">{{ row.completion_rate }}%</td>
+            <td class="num">{{ row.billed|rwf }}</td>
+            <td class="num pe-3">{{ row.collected|rwf }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="10" class="text-center text-body-secondary py-4">No appointments match these filters.</td></tr>
+          {% endfor %}
+        </tbody>
+        {% if summary %}
+        <tfoot class="fw-semibold">
+          <tr>
+            <td class="ps-3" colspan="2">Total</td>
+            <td class="num">{{ totals.total }}</td>
+            <td class="num">{{ totals.completed }}</td>
+            <td class="num">{{ totals.scheduled }}</td>
+            <td class="num">{{ totals.cancelled }}</td>
+            <td class="num">{{ totals.no_show }}</td>
+            <td class="num">{{ totals.completion_rate }}%</td>
+            <td class="num">{{ totals.billed|rwf }}</td>
+            <td class="num pe-3">{{ totals.collected|rwf }}</td>
+          </tr>
+        </tfoot>
+        {% endif %}
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

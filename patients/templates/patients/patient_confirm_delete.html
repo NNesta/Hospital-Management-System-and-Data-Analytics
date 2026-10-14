@@ -1,0 +1,7 @@
+{% extends "confirm_delete_base.html" %}
+{% block page_title %}Delete patient{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'patients:list' %}">Patients</a></li><li class="breadcrumb-item active">Delete</li>{% endblock %}
+{% block warning %}
+<p>Are you sure you want to delete <strong>{{ patient.full_name }}</strong> ({{ patient.patient_code }})?</p>
+<p class="mb-0 text-body-secondary">Patients who already have appointments or invoices are kept for history and cannot be deleted.</p>
+{% endblock %}

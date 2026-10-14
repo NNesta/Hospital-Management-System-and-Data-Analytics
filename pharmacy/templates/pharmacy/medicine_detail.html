@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load hms_extras %}
+{% block title %}{{ medicine.name }}{% endblock %}
+{% block page_title %}{{ medicine.name }}{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'pharmacy:medicine_list' %}">Medicines</a></li><li class="breadcrumb-item active">{{ medicine.name|truncatechars:24 }}</li>{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-4">
+    <div class="card card-warning card-outline mb-4">
+      <div class="card-header"><h3 class="card-title">Stock card</h3></div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between"><span>Generic name</span><span>{{ medicine.generic_name }}</span></li>
+        <li class="list-group-item d-flex justify-content-between"><span>Category</span><span>{{ medicine.get_category_display }}</span></li>
+        <li class="list-group-item d-flex justify-content-between"><span>Unit price</span><strong>{{ medicine.unit_price|rwf }}</strong></li>
+        <li class="list-group-item d-flex justify-content-between"><span>In stock</span>
+          {% if medicine.is_low_stock %}<span class="badge text-bg-danger fs-6">{{ medicine.stock_quantity }} &middot; low</span>{% else %}<strong>{{ medicine.stock_quantity }}</strong>{% endif %}</li>
+        <li class="list-group-item d-flex justify-content-between"><span>Reorder level</span><span>{{ medicine.reorder_level }}</span></li>
+        <li class="list-group-item d-flex justify-content-between"><span>Expiry date</span><span>{{ medicine.expiry_date|date:"j M Y" }}{% if medicine.is_expired %} <span class="badge text-bg-dark">Expired</span>{% endif %}</span></li>
+      </ul>
+      {% if user|has_role:"ADMIN,PHARMACIST" %}
+      <div class="card-footer d-flex gap-2">
+        <a href="{% url 'pharmacy:medicine_update' medicine.pk %}" class="btn btn-sm btn-primary"><i class="bi bi-pencil me-1"></i>Edit / restock</a>
+        <a href="{% url 'pharmacy:medicine_delete' medicine.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>Delete</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card mb-4">
+      <div class="card-header"><h3 class="card-title">Recently prescribed</h3></div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead><tr><th>Date</th><th>Prescription</th><th>Patient</th><th>Doctor</th><th class="num">Qty</th></tr></thead>
+          <tbody>
+            {% for item in recent_items %}
+            <tr>
+              <td>{{ item.prescription.issued_at|date:"j M Y" }}</td>
+              <td><a href="{{ item.prescription.get_absolute_url }}">{{ item.prescription.code }}</a></td>
+              <td>{{ item.prescription.medical_record.appointment.patient.full_name }}</td>
+              <td>{{ item.prescription.medical_record.appointment.doctor }}</td>
+              <td class="num">{{ item.quantity }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center text-body-secondary py-4">Not prescribed yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

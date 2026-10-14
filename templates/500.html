@@ -1,0 +1,28 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Server error | Ubuzima HMS</title>
+  <script src="{% static 'js/theme.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/bootstrap-icons.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/adminlte/css/adminlte.min.css' %}">
+</head>
+<body class="bg-body-tertiary">
+<main class="d-flex align-items-center min-vh-100 py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6 text-center">
+        <div class="display-1 fw-bold text-danger lh-1 mb-3">500</div>
+        <h1 class="h3 mb-3">Something went wrong on our side.</h1>
+        <p class="text-secondary mb-4">
+          The error has been logged. Please try again in a moment,
+          or contact the system administrator if it keeps happening.
+        </p>
+        <a href="/" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to dashboard</a>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

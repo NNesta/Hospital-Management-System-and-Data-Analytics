@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load static hms_extras %}
+{% block title %}{{ invoice.invoice_number }}{% endblock %}
+{% block page_title %}Invoice {{ invoice.invoice_number }}{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'billing:invoice_list' %}">Invoices</a></li><li class="breadcrumb-item"><a href="{{ invoice.get_absolute_url }}">{{ invoice.invoice_number }}</a></li><li class="breadcrumb-item active">Print</li>{% endblock %}
+{% block content %}
+{# Based on AdminLTE 4's pages/invoice.html #}
+<div class="d-flex justify-content-end gap-2 mb-3 d-print-none">
+  <a href="{{ invoice.get_absolute_url }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+  <button class="btn btn-primary" onclick="window.print()" type="button"><i class="bi bi-printer me-1"></i>Print</button>
+</div>
+<div class="card">
+  <div class="card-body p-4 p-md-5">
+    <div class="row mb-4">
+      <div class="col-sm-6 d-flex gap-3">
+        <img src="{% static 'img/logo.svg' %}" alt="" width="56" height="56">
+        <div>
+          <h2 class="h4 mb-0 text-primary fw-semibold">{{ HOSPITAL.NAME }}</h2>
+          <p class="text-secondary mb-0 small">
+            {{ HOSPITAL.ADDRESS }}<br>
+            Tel: {{ HOSPITAL.PHONE }} &middot; {{ HOSPITAL.EMAIL }}<br>
+            TIN: {{ HOSPITAL.TIN }}
+          </p>
+        </div>
+      </div>
+      <div class="col-sm-6 text-sm-end">
+        <h1 class="h2 mb-1">Invoice</h1>
+        <p class="text-secondary mb-0"><span class="fw-semibold">#</span>{{ invoice.invoice_number }}</p>
+        {% status_badge invoice %}
+      </div>
+    </div>
+    <div class="row mb-4">
+      <div class="col-sm-6">
+        <p class="text-secondary small mb-1">Billed to</p>
+        <p class="mb-0 fw-semibold">{{ invoice.patient.full_name }}</p>
+        <p class="text-secondary small mb-0">
+          Patient code: {{ invoice.patient.patient_code }}<br>
+          {{ invoice.patient.address }}, {{ invoice.patient.district }}<br>
+          Tel: {{ invoice.patient.phone }}<br>
+          Insurance: {{ invoice.patient.get_insurance_provider_display }}{% if invoice.patient.insurance_number %} &middot; {{ invoice.patient.insurance_number }}{% endif %}
+        </p>
+      </div>
+      <div class="col-sm-6 text-sm-end">
+        <p class="text-secondary small mb-1">Issue date</p>
+        <p class="mb-2">{{ invoice.issue_date|date:"j F Y" }}</p>
+        <p class="text-secondary small mb-1">Due date</p>
+        <p class="mb-2">{{ invoice.due_date|date:"j F Y" }}</p>
+        {% if invoice.appointment %}
+        <p class="text-secondary small mb-1">Attending doctor</p>
+        <p class="mb-0">{{ invoice.appointment.doctor }} &middot; {{ invoice.appointment.doctor.department.name }}</p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="table-responsive mb-3">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th class="border-top-0">Description</th>
+            <th class="border-top-0 text-end" style="width: 6rem">Qty</th>
+            <th class="border-top-0 text-end" style="width: 9rem">Unit price</th>
+            <th class="border-top-0 text-end" style="width: 9rem">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in invoice.items.all %}
+          <tr>
+            <td><p class="mb-0 fw-semibold">{{ item.description }}</p><small class="text-secondary">{{ item.get_item_type_display }}</small></td>
+            <td class="text-end">{{ item.quantity }}</td>
+            <td class="text-end">{{ item.unit_price|rwf }}</td>
+            <td class="text-end">{{ item.line_total|rwf }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="row justify-content-end">
+      <div class="col-md-5 col-lg-4">
+        <dl class="row mb-0">
+          <dt class="col-7 text-secondary fw-normal">Subtotal</dt>
+          <dd class="col-5 text-end mb-2">{{ invoice.total|rwf }}</dd>
+          <dt class="col-7 text-secondary fw-normal">VAT</dt>
+          <dd class="col-5 text-end mb-2">Exempt</dd>
+          <dt class="col-7 text-secondary fw-normal">Paid</dt>
+          <dd class="col-5 text-end mb-2">{{ invoice.amount_paid|rwf }}</dd>
+          <dt class="col-7 fw-semibold border-top pt-2">Balance due</dt>
+          <dd class="col-5 text-end fw-semibold border-top pt-2 mb-0">{{ invoice.balance|rwf }}</dd>
+        </dl>
+      </div>
+    </div>
+    <hr class="my-4">
+    <p class="text-secondary small mb-0">
+      Murakoze! Thank you for choosing {{ HOSPITAL.NAME }}. Pay at the cashier, by MTN MoMo or Airtel Money,
+      or through your insurer. Questions: {{ HOSPITAL.EMAIL }}.
+    </p>
+  </div>
+</div>
+{% endblock %}

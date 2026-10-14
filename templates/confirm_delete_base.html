@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% comment %}
+  Shared delete page: a warning card naming the record and a red Confirm
+  button that submits a POST. Used by every <model>_confirm_delete.html.
+{% endcomment %}
+{% block title %}Confirm{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card card-danger card-outline">
+      <div class="card-header">
+        <h3 class="card-title"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>{% block card_title %}Confirm delete{% endblock %}</h3>
+      </div>
+      <div class="card-body">
+        {% block warning %}
+          <p class="mb-0">Are you sure you want to delete <strong>{{ object }}</strong>? This cannot be undone.</p>
+        {% endblock %}
+      </div>
+      <div class="card-footer d-flex justify-content-end gap-2">
+        <a href="{% block cancel_url %}{{ object.get_absolute_url }}{% endblock %}" class="btn btn-outline-secondary">Cancel</a>
+        <form method="post" class="m-0">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger"><i class="bi bi-{% block confirm_icon %}trash{% endblock %} me-1"></i>{% block confirm_label %}Yes, delete{% endblock %}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

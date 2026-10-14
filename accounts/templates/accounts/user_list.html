@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Users{% endblock %}
+{% block page_title %}Users &amp; roles{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item active">Users</li>{% endblock %}
+{% block content %}
+<div class="card mb-4">
+  <div class="card-header d-flex flex-wrap gap-2 align-items-center">
+    <form method="get" class="d-flex flex-wrap gap-2 flex-grow-1" role="search">
+      <div class="input-group" style="max-width: 22rem">
+        <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Search name, username, phone" aria-label="Search">
+        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+      </div>
+      <select name="role" class="form-select" style="max-width: 12rem" onchange="this.form.submit()" aria-label="Role">
+        <option value="">All roles</option>
+        {% for value, label in role_choices %}<option value="{{ value }}" {% if value == selected_role %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </form>
+    <a href="{% url 'accounts:user_create' %}" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i>New user</a>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Phone</th><th>Email</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          {% for account in object_list %}
+          <tr>
+            <td><a href="{{ account.get_absolute_url }}">{{ account.get_full_name|default:account.username }}</a></td>
+            <td>{{ account.username }}</td>
+            <td><span class="badge text-bg-{{ account.role_color }}">{{ account.get_role_display }}</span></td>
+            <td>{{ account.phone|default:"—" }}</td>
+            <td>{{ account.email|default:"—" }}</td>
+            <td>{% if account.is_active %}<span class="badge text-bg-success">Active</span>{% else %}<span class="badge text-bg-secondary">Deactivated</span>{% endif %}</td>
+            <td class="actions">
+              <a href="{% url 'accounts:user_update' account.pk %}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
+              {% if account.is_active and account != user %}
+              <a href="{% url 'accounts:user_delete' account.pk %}" class="btn btn-sm btn-outline-danger" title="Deactivate"><i class="bi bi-person-x"></i></a>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="text-center text-body-secondary py-4">No users found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card-footer">{% include "partials/_pagination.html" %}</div>
+</div>
+{% endblock %}

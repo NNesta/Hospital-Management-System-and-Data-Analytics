@@ -1,0 +1,8 @@
+{% extends "confirm_delete_base.html" %}
+{% load hms_extras %}
+{% block page_title %}Delete payment{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'billing:payment_list' %}">Payments</a></li><li class="breadcrumb-item active">Delete</li>{% endblock %}
+{% block warning %}
+<p>Delete the payment of <strong>{{ object.amount|rwf }}</strong> on {{ object.invoice.invoice_number }}?</p>
+<p class="mb-0 text-body-secondary">The invoice status is recalculated afterwards.</p>
+{% endblock %}

@@ -1,0 +1,56 @@
+<nav class="app-header navbar navbar-expand bg-body">
+  <div class="container-fluid">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button" aria-label="Toggle sidebar">
+          <i class="bi bi-list"></i>
+        </a>
+      </li>
+      <li class="nav-item d-none d-md-block">
+        <span class="nav-link text-body-secondary">
+          <i class="bi bi-geo-alt me-1"></i>{{ HOSPITAL.NAME }} &middot; {% now "l j F Y" %}
+        </span>
+      </li>
+    </ul>
+
+    <ul class="navbar-nav ms-auto">
+      {# Colour mode switch (same markup as AdminLTE 4's demo) #}
+      <li class="nav-item dropdown">
+        <a class="nav-link" href="#" id="bd-theme" aria-label="Toggle colour mode" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-sun-fill" data-lte-theme-icon="light"></i>
+          <i class="bi bi-moon-fill d-none" data-lte-theme-icon="dark"></i>
+          <i class="bi bi-circle-half d-none" data-lte-theme-icon="auto"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme" style="--bs-dropdown-min-width: 8rem">
+          <li><button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light"><i class="bi bi-sun-fill me-2"></i>Light<i class="bi bi-check-lg ms-auto d-none"></i></button></li>
+          <li><button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark"><i class="bi bi-moon-fill me-2"></i>Dark<i class="bi bi-check-lg ms-auto d-none"></i></button></li>
+          <li><button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto"><i class="bi bi-circle-half me-2"></i>Auto<i class="bi bi-check-lg ms-auto d-none"></i></button></li>
+        </ul>
+      </li>
+
+      <li class="nav-item dropdown user-menu">
+        <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown">
+          <span class="avatar-initials bg-{{ user.role_color }} me-2">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+          <span class="d-none d-md-inline">{{ user.get_full_name|default:user.username }}</span>
+          <span class="badge text-bg-{{ user.role_color }} ms-2 d-none d-sm-inline">{{ user.get_role_display }}</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+          <li class="user-header text-bg-primary">
+            <span class="avatar-initials avatar-lg bg-{{ user.role_color }} shadow">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+            <p>
+              {{ user.get_full_name|default:user.username }} &ndash; {{ user.get_role_display }}
+              <small>Staff since {{ user.date_joined|date:"M Y" }}</small>
+            </p>
+          </li>
+          <li class="user-footer d-flex justify-content-between">
+            <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary">Profile</a>
+            <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-danger">Sign out</button>
+            </form>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav>

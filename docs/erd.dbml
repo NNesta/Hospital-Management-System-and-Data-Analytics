@@ -1,0 +1,156 @@
+// Paste into https://dbdiagram.io, then Export -> PNG for the report.
+Project hospital_db {
+  database_type: 'MySQL'
+  Note: 'Hospital Management System - Ubuzima Referral Hospital, Kigali'
+}
+
+TableGroup accounts { accounts_user }
+TableGroup staff { staff_department staff_doctor }
+TableGroup patients { patients_patient }
+TableGroup appointments { appointments_appointment appointments_medicalrecord }
+TableGroup pharmacy { pharmacy_medicine pharmacy_prescription pharmacy_prescriptionitem }
+TableGroup billing { billing_invoice billing_invoiceitem billing_payment }
+
+Table accounts_user {
+  id bigint [pk]
+  username varchar(150) [unique]
+  first_name varchar(150)
+  last_name varchar(150)
+  email varchar(254)
+  phone varchar(20)
+  role varchar(20) [note: 'ADMIN, RECEPTIONIST, DOCTOR, PHARMACIST, ACCOUNTANT']
+  is_active bool
+}
+
+Table staff_department {
+  id bigint [pk]
+  name varchar(100) [unique]
+  description text
+  location varchar(150)
+  created_at datetime
+}
+
+Table staff_doctor {
+  id bigint [pk]
+  user_id bigint [unique, ref: - accounts_user.id]
+  department_id bigint [ref: > staff_department.id]
+  specialization varchar(100)
+  license_number varchar(30) [unique, note: 'RMDC licence']
+  phone varchar(20)
+  consultation_fee decimal(12,2) [note: 'CHECK > 0']
+  is_available bool
+  is_active bool
+}
+
+Table patients_patient {
+  id bigint [pk]
+  patient_code varchar(12) [unique, note: 'PAT-00001']
+  first_name varchar(60)
+  last_name varchar(60)
+  gender char(1)
+  date_of_birth date
+  blood_group varchar(3)
+  phone varchar(20)
+  email varchar(254)
+  district varchar(30)
+  address varchar(200)
+  national_id varchar(16) [unique, null]
+  insurance_provider varchar(10)
+  insurance_number varchar(30)
+  emergency_contact_name varchar(120)
+  emergency_contact_phone varchar(20)
+  registered_by_id bigint [ref: > accounts_user.id, null]
+  created_at datetime
+}
+
+Table appointments_appointment {
+  id bigint [pk]
+  patient_id bigint [ref: > patients_patient.id]
+  doctor_id bigint [ref: > staff_doctor.id]
+  appointment_date date
+  appointment_time time
+  reason varchar(255)
+  status varchar(10)
+  created_by_id bigint [ref: > accounts_user.id, null]
+  created_at datetime
+  indexes {
+    (doctor_id, appointment_date, appointment_time) [unique, name: 'unique_doctor_slot']
+    appointment_date
+    status
+  }
+}
+
+Table appointments_medicalrecord {
+  id bigint [pk]
+  appointment_id bigint [unique, ref: - appointments_appointment.id]
+  symptoms text
+  diagnosis varchar(255)
+  treatment_plan text
+  notes text
+  follow_up_date date [null]
+  created_at datetime
+}
+
+Table pharmacy_medicine {
+  id bigint [pk]
+  name varchar(120) [unique]
+  generic_name varchar(120)
+  category varchar(20)
+  unit_price decimal(12,2) [note: 'CHECK > 0']
+  stock_quantity int
+  reorder_level int
+  expiry_date date
+}
+
+Table pharmacy_prescription {
+  id bigint [pk]
+  medical_record_id bigint [ref: > appointments_medicalrecord.id]
+  issued_at datetime
+  notes text
+  status varchar(10)
+  dispensed_at datetime [null]
+  dispensed_by_id bigint [ref: > accounts_user.id, null]
+}
+
+Table pharmacy_prescriptionitem {
+  id bigint [pk]
+  prescription_id bigint [ref: > pharmacy_prescription.id]
+  medicine_id bigint [ref: > pharmacy_medicine.id]
+  dosage varchar(60)
+  frequency varchar(60)
+  duration_days int
+  quantity int
+  Note: 'Join table: Prescription <-> Medicine many-to-many with extra data'
+}
+
+Table billing_invoice {
+  id bigint [pk]
+  invoice_number varchar(20) [unique, note: 'INV-2026-00001']
+  patient_id bigint [ref: > patients_patient.id]
+  appointment_id bigint [unique, null, ref: - appointments_appointment.id]
+  issue_date date
+  due_date date
+  status varchar(15)
+  notes text
+  created_by_id bigint [ref: > accounts_user.id, null]
+}
+
+Table billing_invoiceitem {
+  id bigint [pk]
+  invoice_id bigint [ref: > billing_invoice.id]
+  item_type varchar(15)
+  description varchar(200)
+  quantity int
+  unit_price decimal(12,2)
+  medicine_id bigint [ref: > pharmacy_medicine.id, null]
+}
+
+Table billing_payment {
+  id bigint [pk]
+  invoice_id bigint [ref: > billing_invoice.id]
+  amount decimal(12,2) [note: 'CHECK > 0']
+  method varchar(15)
+  reference varchar(60)
+  paid_at datetime
+  received_by_id bigint [ref: > accounts_user.id, null]
+}

@@ -1,0 +1,49 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>{% block title %}Dashboard{% endblock %} | {{ HOSPITAL.SHORT_NAME }}</title>
+  <link rel="icon" href="{% static 'img/logo.svg' %}" type="image/svg+xml">
+  {# Apply the saved colour mode before CSS paints, so dark mode never flashes white. #}
+  <script src="{% static 'js/theme.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/bootstrap-icons.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/adminlte/css/adminlte.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+<div class="app-wrapper">
+  {% include "partials/_navbar.html" %}
+  {% include "partials/_sidebar.html" %}
+  <main class="app-main">
+    <div class="app-content-header">
+      <div class="container-fluid">
+        <div class="row align-items-center">
+          <div class="col-sm-6">
+            <h3 class="mb-0">{% block page_title %}{% endblock %}</h3>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-end mb-0">
+              <li class="breadcrumb-item"><a href="{% url 'analytics:dashboard' %}">Home</a></li>
+              {% block breadcrumbs %}{% endblock %}
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="app-content">
+      <div class="container-fluid">
+        {% include "partials/_messages.html" %}
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+  </main>
+  {% include "partials/_footer.html" %}
+</div>
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'vendor/adminlte/js/adminlte.min.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

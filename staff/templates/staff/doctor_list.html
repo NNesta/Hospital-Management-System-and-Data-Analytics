@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load hms_extras %}
+{% block title %}Doctors{% endblock %}
+{% block page_title %}Doctors{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item active">Doctors</li>{% endblock %}
+{% block content %}
+<div class="card mb-4">
+  <div class="card-header d-flex flex-wrap gap-2 align-items-center">
+    <form method="get" class="d-flex flex-wrap gap-2 flex-grow-1 align-items-center" role="search">
+      <div class="input-group" style="max-width: 22rem">
+        <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Search name, licence, specialty" aria-label="Search">
+        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+      </div>
+      <select name="department" class="form-select" style="max-width: 15rem" onchange="this.form.submit()" aria-label="Department">
+        <option value="">All departments</option>
+        {% for d in departments %}<option value="{{ d.pk }}" {% if d.pk|stringformat:"s" == selected_department %}selected{% endif %}>{{ d.name }}</option>{% endfor %}
+      </select>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="show" value="all" id="show-all" {% if show_all %}checked{% endif %} onchange="this.form.submit()">
+        <label class="form-check-label" for="show-all">Include inactive</label>
+      </div>
+    </form>
+    {% if user|has_role:"ADMIN" %}
+    <a href="{% url 'staff:doctor_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>New doctor</a>
+    {% endif %}
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Doctor</th><th>Department</th><th>Specialization</th><th>Licence</th><th>Phone</th><th class="num">Fee</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          {% for doctor in object_list %}
+          <tr>
+            <td><a href="{{ doctor.get_absolute_url }}">{{ doctor }}</a></td>
+            <td>{{ doctor.department.name }}</td>
+            <td>{{ doctor.specialization }}</td>
+            <td><code>{{ doctor.license_number }}</code></td>
+            <td>{{ doctor.phone }}</td>
+            <td class="num">{{ doctor.consultation_fee|rwf }}</td>
+            <td>
+              {% if not doctor.is_active %}<span class="badge text-bg-secondary">Inactive</span>
+              {% elif doctor.is_available %}<span class="badge text-bg-success">Available</span>
+              {% else %}<span class="badge text-bg-warning">Unavailable</span>{% endif %}
+            </td>
+            <td class="actions">
+              {% if user|has_role:"ADMIN" %}
+              <a href="{% url 'staff:doctor_update' doctor.pk %}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
+              {% if doctor.is_active %}<a href="{% url 'staff:doctor_delete' doctor.pk %}" class="btn btn-sm btn-outline-danger" title="Deactivate"><i class="bi bi-person-x"></i></a>{% endif %}
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="8" class="text-center text-body-secondary py-4">No doctors found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card-footer">{% include "partials/_pagination.html" %}</div>
+</div>
+{% endblock %}

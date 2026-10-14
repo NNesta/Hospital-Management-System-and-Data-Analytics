@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Access denied{% endblock %}
+{% block page_title %}Access denied{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6 text-center py-5">
+    <div class="display-1 fw-bold text-warning lh-1 mb-3">403</div>
+    <h1 class="h3 mb-3">This page is not available for your role.</h1>
+    <p class="text-secondary mb-4">
+      You are signed in as <strong>{{ user.get_role_display|default:"a guest" }}</strong>.
+      Ask an administrator if you need access.
+    </p>
+    <a href="{% url 'analytics:dashboard' %}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i>Back to dashboard
+    </a>
+  </div>
+</div>
+{% endblock %}

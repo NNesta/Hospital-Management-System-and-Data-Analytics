@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load hms_extras %}
+{% block title %}Patients{% endblock %}
+{% block page_title %}{% if user.role == "DOCTOR" %}My patients{% else %}Patients{% endif %}{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item active">Patients</li>{% endblock %}
+{% block content %}
+<div class="card mb-4">
+  <div class="card-header d-flex flex-wrap gap-2 align-items-center">
+    <form method="get" class="d-flex flex-wrap gap-2 flex-grow-1" role="search">
+      <div class="input-group" style="max-width: 24rem">
+        <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Search name, PAT code, phone, ID" aria-label="Search">
+        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+      </div>
+      <select name="district" class="form-select" style="max-width: 14rem" onchange="this.form.submit()" aria-label="District">
+        <option value="">All districts</option>
+        {% for province, districts in district_choices %}
+          <optgroup label="{{ province }}">
+            {% for value, label in districts %}<option value="{{ value }}" {% if value == selected_district %}selected{% endif %}>{{ label }}</option>{% endfor %}
+          </optgroup>
+        {% endfor %}
+      </select>
+    </form>
+    {% if user|has_role:"ADMIN,RECEPTIONIST" %}
+    <a href="{% url 'patients:create' %}" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i>Register patient</a>
+    {% endif %}
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Code</th><th>Name</th><th>Gender</th><th class="num">Age</th><th>Phone</th><th>District</th><th>Insurance</th><th>Registered</th><th></th></tr></thead>
+        <tbody>
+          {% for patient in object_list %}
+          <tr>
+            <td><code>{{ patient.patient_code }}</code></td>
+            <td><a href="{{ patient.get_absolute_url }}">{{ patient.full_name }}</a></td>
+            <td>{{ patient.get_gender_display }}</td>
+            <td class="num">{{ patient.age }}</td>
+            <td>{{ patient.phone }}</td>
+            <td>{{ patient.district }}</td>
+            <td><span class="badge text-bg-light border">{{ patient.insurance_provider }}</span></td>
+            <td>{{ patient.created_at|date:"j M Y" }}</td>
+            <td class="actions">
+              {% if user|has_role:"ADMIN,RECEPTIONIST" %}
+              <a href="{% url 'appointments:create' %}?patient={{ patient.pk }}" class="btn btn-sm btn-outline-success" title="Book appointment"><i class="bi bi-calendar-plus"></i></a>
+              <a href="{% url 'patients:update' patient.pk %}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
+              {% endif %}
+              {% if user|has_role:"ADMIN" %}
+              <a href="{% url 'patients:delete' patient.pk %}" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></a>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="9" class="text-center text-body-secondary py-4">No patients found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card-footer">{% include "partials/_pagination.html" %}</div>
+</div>
+{% endblock %}

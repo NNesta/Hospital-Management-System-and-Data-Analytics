@@ -1,0 +1,32 @@
+<h2 class="h5 text-body-secondary text-uppercase mt-2 mb-3"><i class="bi bi-heart-pulse me-2"></i>Patients &amp; appointments</h2>
+<div class="row">
+  <div class="col-lg-8">
+    {% include "analytics/_chart_card.html" with chart_id="intakeChart" title="New patients per month" question="Is patient intake growing? Registrations over the last 12 months." %}
+  </div>
+  <div class="col-lg-4">
+    {% include "analytics/_chart_card.html" with chart_id="statusChart" title="Appointment status" question="How many no-shows and cancellations? Last 12 months." %}
+  </div>
+</div>
+{% if is_doctor %}
+<div class="row">
+  <div class="col-lg-7">
+    {% include "analytics/_chart_card.html" with chart_id="ageGenderChart" title="My patients by age group and gender" question="Who are my patients?" %}
+  </div>
+  <div class="col-lg-5">{% include "analytics/sections/_todays_table.html" %}</div>
+</div>
+{% else %}
+<div class="row">
+  <div class="col-lg-6">
+    {% include "analytics/_chart_card.html" with chart_id="departmentChart" title="Appointments by department" question="Which departments are busiest? Last 12 months." %}
+  </div>
+  <div class="col-lg-6">
+    {% include "analytics/_chart_card.html" with chart_id="ageGenderChart" title="Patients by age group and gender" question="Who are our patients?" %}
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-6">
+    {% include "analytics/_chart_card.html" with chart_id="workloadChart" title="Doctor workload" question="Who sees the most patients? Completed visits, last 12 months." %}
+  </div>
+  <div class="col-lg-6">{% include "analytics/sections/_todays_table.html" %}</div>
+</div>
+{% endif %}

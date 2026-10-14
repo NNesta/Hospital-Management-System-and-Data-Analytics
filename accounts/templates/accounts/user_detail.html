@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{{ account }}{% endblock %}
+{% block page_title %}{{ account.get_full_name|default:account.username }}{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item"><a href="{% url 'accounts:user_list' %}">Users</a></li><li class="breadcrumb-item active">{{ account.username }}</li>{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-4">
+    <div class="card card-primary card-outline mb-4">
+      <div class="card-body text-center">
+        <span class="avatar-initials profile-avatar bg-{{ account.role_color }}">{{ account.first_name|first|upper }}{{ account.last_name|first|upper }}</span>
+        <h3 class="h5 mt-3 mb-1">{{ account.get_full_name|default:account.username }}</h3>
+        <span class="badge text-bg-{{ account.role_color }}">{{ account.get_role_display }}</span>
+        {% if not account.is_active %}<span class="badge text-bg-secondary">Deactivated</span>{% endif %}
+      </div>
+      <div class="card-footer d-flex flex-wrap gap-2 justify-content-center">
+        <a href="{% url 'accounts:user_update' account.pk %}" class="btn btn-sm btn-primary"><i class="bi bi-pencil me-1"></i>Edit</a>
+        <a href="{% url 'accounts:user_password' account.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-key me-1"></i>Reset password</a>
+        {% if account.is_active and account != user %}
+        <a href="{% url 'accounts:user_delete' account.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-person-x me-1"></i>Deactivate</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="card mb-4">
+      <div class="card-header"><h3 class="card-title">Account details</h3></div>
+      <div class="card-body">
+        <dl class="row detail-list mb-0">
+          <dt class="col-sm-4">Username</dt><dd class="col-sm-8">{{ account.username }}</dd>
+          <dt class="col-sm-4">Email</dt><dd class="col-sm-8">{{ account.email|default:"—" }}</dd>
+          <dt class="col-sm-4">Phone</dt><dd class="col-sm-8">{{ account.phone|default:"—" }}</dd>
+          <dt class="col-sm-4">Joined</dt><dd class="col-sm-8">{{ account.date_joined|date:"j M Y" }}</dd>
+          <dt class="col-sm-4">Last login</dt><dd class="col-sm-8">{{ account.last_login|date:"j M Y, H:i"|default:"Never" }}</dd>
+          {% if account.doctor_profile %}
+          <dt class="col-sm-4">Doctor profile</dt><dd class="col-sm-8"><a href="{{ account.doctor_profile.get_absolute_url }}">{{ account.doctor_profile }} &middot; {{ account.doctor_profile.department }}</a></dd>
+          {% elif account.role == "DOCTOR" %}
+          <dt class="col-sm-4">Doctor profile</dt><dd class="col-sm-8"><a href="{% url 'staff:doctor_create' %}">Create the doctor profile</a></dd>
+          {% endif %}
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
