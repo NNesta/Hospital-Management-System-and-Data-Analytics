@@ -1,6 +1,6 @@
 # Hospital Management System & Data Analytics
 
-A Django 5.2 + MySQL hospital system for the fictional **Ubuzima Referral
+A Django 5.2 + SQLite hospital system for the fictional **Ubuzima Referral
 Hospital** (Kacyiru, Kigali). It digitises the patient journey — registration,
 appointments, consultations, prescriptions, pharmacy stock, invoices and
 payments — and turns the data into a live analytics dashboard styled with
@@ -36,27 +36,16 @@ AdminLTE 4.
 |---|---|
 | Language | Python 3.12 or 3.13 (same minor version on every laptop) |
 | Framework | Django 5.2 LTS |
-| Database | MySQL 8.4 LTS (`mysqlclient`) |
+| Database | SQLite (`db.sqlite3`, built into Python; nothing to install) |
 | UI | AdminLTE 4.0 + Bootstrap 5.3 + Bootstrap Icons, served locally from `static/vendor/` |
 | Charts | Chart.js 4.5 |
 | Config | `python-decouple` (`.env`) |
 | Demo data | `Faker` + curated Rwandan names, places, medicines |
 
-## Setup (about 1 hour per laptop)
+## Setup (about 15 minutes per laptop)
 
-1. Install Python 3.12/3.13, MySQL 8.4 and Git, then clone the repository.
-   Check the server version with `SELECT VERSION();`; Django 5.2 needs MySQL 8.0.11+
-   (XAMPP's bundled MariaDB is often too old).
-2. Create the database and a user (run in the MySQL shell as root):
-
-   ```sql
-   CREATE DATABASE hospital_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-   CREATE USER 'hms_user'@'localhost' IDENTIFIED BY 'choose-a-password';
-   GRANT ALL PRIVILEGES ON hospital_db.* TO 'hms_user'@'localhost';
-   GRANT ALL PRIVILEGES ON test_hospital_db.* TO 'hms_user'@'localhost';  -- for `manage.py test`
-   ```
-
-3. Create and activate a virtual environment:
+1. Install Python 3.12/3.13 and Git, then clone the repository.
+2. Create and activate a virtual environment:
 
    ```bash
    python3 -m venv venv
@@ -64,9 +53,10 @@ AdminLTE 4.
    pip install -r requirements.txt
    ```
 
-4. Copy `.env.example` to `.env` and fill in `DB_PASSWORD` and a long random `SECRET_KEY`
+3. Copy `.env.example` to `.env` and set a long random `SECRET_KEY`
    (`python -c "import secrets; print(secrets.token_urlsafe(50))"`).
-5. Build the tables, load the demo data and start the server:
+4. Build the tables, load the demo data and start the server. `migrate` creates
+   `db.sqlite3` in the project folder.
 
    ```bash
    python manage.py migrate
@@ -74,7 +64,7 @@ AdminLTE 4.
    python manage.py runserver
    ```
 
-6. Open <http://127.0.0.1:3000> and sign in.
+5. Open <http://127.0.0.1:3000> and sign in.
 
 ### Demo logins
 
@@ -135,24 +125,13 @@ pharmacy → billing → analytics), so apps never import each other in a circle
 
 ## Notes and troubleshooting
 
-- **Monthly charts and MySQL time zones.** `DATABASES["default"]["TIME_ZONE"]` is set to
-  `Africa/Kigali`, the same as `TIME_ZONE`, so Django never wraps columns in `CONVERT_TZ()`.
-  `TruncMonth` and `__date` lookups therefore work even when MySQL's time-zone tables are
-  not loaded.
-- **`mysqlclient` will not install** (often on Windows): use a Python version with a prebuilt
-  wheel, or `pip install PyMySQL` and add this to `config/__init__.py`:
-
-  ```python
-  import pymysql
-  pymysql.install_as_MySQLdb()
-  ```
-
 - **Logout returns 405**: Django 5 logs out with POST only; use the *Sign out* button.
 - **AdminLTE looks unstyled**: check the browser console for 404s on `/static/...`;
   all assets are local under `static/vendor/`, so the demo works offline.
 - **Empty dashboard**: run `python manage.py seed_data` right after `migrate`.
 - **Hospital name**: set `HOSPITAL_NAME`, `HOSPITAL_ADDRESS`, `HOSPITAL_TIN`… in `.env`.
-- **Backup for demo day**: `mysqldump -u hms_user -p hospital_db > hospital_db.sql`.
+- **Backup for demo day**: stop the server and copy `db.sqlite3` to a folder outside
+  the project; copy it back to restore.
 
 More: [User guide (one section per role)](docs/USER_GUIDE.md) ·
 [ERD](docs/ERD.md) · [Screenshots](docs/screenshots/) ·

@@ -77,35 +77,17 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 
-# Database (MySQL 8.4 LTS) ----------------------------------------------------
+# Database (SQLite: a single db.sqlite3 file, git-ignored) ----------------------
 
-if config("DB_ENGINE", default="mysql") == "sqlite":
-    # Fallback for hosts without MySQL (e.g. a free PythonAnywhere account).
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-            "TIME_ZONE": "Africa/Kigali",
-        }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+        # Store datetimes in Kigali time, so the raw values in the file match
+        # what the app shows.
+        "TIME_ZONE": "Africa/Kigali",
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.mysql",
-            "NAME": config("DB_NAME", default="hospital_db"),
-            "USER": config("DB_USER", default="hms_user"),
-            "PASSWORD": config("DB_PASSWORD", default=""),
-            "HOST": config("DB_HOST", default="127.0.0.1"),
-            "PORT": config("DB_PORT", default="3306"),
-            "OPTIONS": {"charset": "utf8mb4"},
-            # Store datetimes in Kigali time. Because the connection time zone then
-            # matches TIME_ZONE, Django never wraps columns in CONVERT_TZ(), so
-            # TruncMonth/__date work even when MySQL's time zone tables are not
-            # loaded (see "Monthly charts come back empty" in the plan).
-            "TIME_ZONE": "Africa/Kigali",
-            "TEST": {"NAME": "test_hospital_db", "CHARSET": "utf8mb4"},
-        }
-    }
+}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

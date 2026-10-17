@@ -93,8 +93,8 @@ erDiagram
         varchar generic_name
         varchar category
         decimal unit_price "CHECK > 0"
-        int stock_quantity "unsigned"
-        int reorder_level "unsigned"
+        int stock_quantity "CHECK >= 0"
+        int reorder_level "CHECK >= 0"
         date expiry_date
     }
     pharmacy_prescription {
@@ -159,7 +159,7 @@ keep it readable.
 | One-to-many | Department → Doctors, Patient → Appointments, Invoice → Payments | `ForeignKey` |
 | Many-to-many with extra data | Prescription ↔ Medicine via PrescriptionItem (dosage, quantity) | `ManyToManyField(through="PrescriptionItem")` |
 
-## Constraints enforced by MySQL
+## Constraints
 
 - `unique_doctor_slot`: (doctor, appointment_date, appointment_time) blocks double booking.
 - `unique_medicine_per_prescription`: a medicine appears once per prescription.

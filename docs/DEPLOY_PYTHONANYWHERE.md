@@ -3,8 +3,8 @@
 The site ends up at `https://yourusername.pythonanywhere.com`, where `yourusername` is
 your PythonAnywhere username (in lowercase).
 
-Free Beginner accounts don't include MySQL, so the hosted site uses SQLite
-(`DB_ENGINE=sqlite`). Every page and chart works the same as with MySQL.
+The database is a SQLite file (`db.sqlite3`) in the project folder, so there is no
+database server to set up.
 
 **Free account limits:**
 - one web app;
@@ -14,8 +14,7 @@ Free Beginner accounts don't include MySQL, so the hosted site uses SQLite
 
 ## 0. Before you start
 
-- Push your latest commits to `main` on GitHub. PythonAnywhere clones from there, and
-  `config/settings.py` must include the `DB_ENGINE` switch.
+- Push your latest commits to `main` on GitHub. PythonAnywhere clones from there.
 - Sign up at [pythonanywhere.com](https://www.pythonanywhere.com/) with a **Beginner** (free) account.
 
 ## 1. Create the web app
@@ -35,10 +34,8 @@ mkvirtualenv --python=/usr/bin/python3.13 hms-venv
 pip install -r requirements.txt
 ```
 
-This takes a few minutes. If `python3.13` is not found, choose the newest system image
-under **Account → System image** and try again. If `mysqlclient` fails to build, skip it
-(SQLite doesn't need it):
-`pip install Django==5.2.18 python-decouple==3.8 Faker==40.43.0`.
+If `python3.13` is not found, choose the newest system image under
+**Account → System image** and try again.
 
 ## 3. Configure and load the demo data
 
@@ -56,7 +53,6 @@ DEBUG=False
 ALLOWED_HOSTS=$SITE
 CSRF_TRUSTED_ORIGINS=https://$SITE
 HTTPS_ONLY=True
-DB_ENGINE=sqlite
 EOF
 python manage.py migrate
 python manage.py seed_data
@@ -125,17 +121,3 @@ Then click **Reload** on the **Web** tab. Before a demo, run
 - **Changes to `.env` or the code have no effect**: click **Reload**.
 - **Site switched off**: free web apps expire unless renewed. Click the button on the Web
   tab to extend it, then reload.
-
-## Using MySQL instead (paid accounts)
-
-Paid accounts, and free accounts created before 15 January 2026, include MySQL. On the
-**Databases** tab, set a MySQL password and create a database called `hospital_db`.
-Then, in `.env`, replace `DB_ENGINE=sqlite` with the following lines and run
-`python manage.py migrate` and `python manage.py seed_data` again:
-
-```ini
-DB_NAME=yourusername$hospital_db
-DB_USER=yourusername
-DB_PASSWORD=the-mysql-password
-DB_HOST=yourusername.mysql.pythonanywhere-services.com
-```

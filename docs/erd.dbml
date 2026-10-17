@@ -1,6 +1,5 @@
 // Paste into https://dbdiagram.io, then Export -> PNG for the report.
-Project hospital_db {
-  database_type: 'MySQL'
+Project ubuzima_hms {
   Note: 'Hospital Management System - Ubuzima Referral Hospital, Kigali'
 }
 

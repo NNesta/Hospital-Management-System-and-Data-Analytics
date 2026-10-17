@@ -1,5 +1,4 @@
 # Pinned so all three laptops run exactly the same versions (Python 3.12/3.13).
 Django==5.2.18          # LTS, supported until April 2028
-mysqlclient==2.3.0      # MySQL driver; fallback: PyMySQL (see README)
 python-decouple==3.8    # reads secrets from .env
 Faker==40.43.0          # used by `manage.py seed_data`
