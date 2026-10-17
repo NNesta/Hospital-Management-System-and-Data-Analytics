@@ -74,7 +74,7 @@ AdminLTE 4.
    python manage.py runserver
    ```
 
-6. Open <http://127.0.0.1:8000> and sign in.
+6. Open <http://127.0.0.1:3000> and sign in.
 
 ### Demo logins
 
@@ -155,4 +155,5 @@ pharmacy → billing → analytics), so apps never import each other in a circle
 - **Backup for demo day**: `mysqldump -u hms_user -p hospital_db > hospital_db.sql`.
 
 More: [User guide (one section per role)](docs/USER_GUIDE.md) ·
-[ERD](docs/ERD.md) · [Screenshots](docs/screenshots/)
+[ERD](docs/ERD.md) · [Screenshots](docs/screenshots/) ·
+[Deploying to PythonAnywhere](docs/DEPLOY_PYTHONANYWHERE.md)

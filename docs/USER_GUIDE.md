@@ -1,7 +1,7 @@
 # User guide
 
 One page per role at **Ubuzima Referral Hospital**. Sign in at
-<http://127.0.0.1:8000/accounts/login/>. After running `seed_data`, every demo
+<http://127.0.0.1:3000/accounts/login/>. After running `seed_data`, every demo
 account uses the password **`Ubuzima@2026`**.
 
 Common to everyone:

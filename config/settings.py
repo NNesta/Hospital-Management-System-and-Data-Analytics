@@ -15,6 +15,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default=False, cast=bool)
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,localhost", cast=Csv())
+# Hosted over HTTPS (e.g. https://<username>.pythonanywhere.com), list the full origin here.
+CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="", cast=Csv())
+# True once the site is HTTPS-only (PythonAnywhere: Web tab -> Force HTTPS), so the
+# session and CSRF cookies are never sent over plain HTTP.
+SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = config("HTTPS_ONLY", default=False, cast=bool)
 
 
 # Applications -----------------------------------------------------------------
@@ -74,23 +79,33 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 # Database (MySQL 8.4 LTS) ----------------------------------------------------
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": config("DB_NAME", default="hospital_db"),
-        "USER": config("DB_USER", default="hms_user"),
-        "PASSWORD": config("DB_PASSWORD", default=""),
-        "HOST": config("DB_HOST", default="127.0.0.1"),
-        "PORT": config("DB_PORT", default="3306"),
-        "OPTIONS": {"charset": "utf8mb4"},
-        # Store datetimes in Kigali time. Because the connection time zone then
-        # matches TIME_ZONE, Django never wraps columns in CONVERT_TZ(), so
-        # TruncMonth/__date work even when MySQL's time zone tables are not
-        # loaded (see "Monthly charts come back empty" in the plan).
-        "TIME_ZONE": "Africa/Kigali",
-        "TEST": {"NAME": "test_hospital_db", "CHARSET": "utf8mb4"},
+if config("DB_ENGINE", default="mysql") == "sqlite":
+    # Fallback for hosts without MySQL (e.g. a free PythonAnywhere account).
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+            "TIME_ZONE": "Africa/Kigali",
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": config("DB_NAME", default="hospital_db"),
+            "USER": config("DB_USER", default="hms_user"),
+            "PASSWORD": config("DB_PASSWORD", default=""),
+            "HOST": config("DB_HOST", default="127.0.0.1"),
+            "PORT": config("DB_PORT", default="3306"),
+            "OPTIONS": {"charset": "utf8mb4"},
+            # Store datetimes in Kigali time. Because the connection time zone then
+            # matches TIME_ZONE, Django never wraps columns in CONVERT_TZ(), so
+            # TruncMonth/__date work even when MySQL's time zone tables are not
+            # loaded (see "Monthly charts come back empty" in the plan).
+            "TIME_ZONE": "Africa/Kigali",
+            "TEST": {"NAME": "test_hospital_db", "CHARSET": "utf8mb4"},
+        }
+    }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
